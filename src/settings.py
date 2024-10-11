@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -119,16 +122,12 @@ CORS_ALLOW_HEADERS = [
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DB produccion
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'portalow',
-        'USER': 'portal',
-        'PASSWORD': 'Ow321654',
-        'HOST': 'localhost', 
-        'PORT': '',  
-    }
+    'default': dj_database_url.config(),
 }
+
+#
 """ Si no tienes la BD psotgres configurada, descomenta esto y comenta el de arriba para correr
 DATABASES = {
     'default': {
