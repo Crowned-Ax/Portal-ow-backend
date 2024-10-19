@@ -1,8 +1,10 @@
-from django.urls import path
-from .views import ClientServiceViewSet
+from django.urls import path, include
+from .views import ServicesViewSet
+from rest_framework.routers import DefaultRouter
 
+router = DefaultRouter()
+router.register(r'services', ServicesViewSet)
 
 urlpatterns = [
-    path('client/<int:client_id>/clientservices/', ClientServiceViewSet.as_view({'post': 'create'}), name='create-clientservice'),
-    path('client/<int:client_id>/clientservices/<int:pk>/', ClientServiceViewSet.as_view({'delete': 'destroy'}), name='delete-clientservice'),
+    path('', include(router.urls)),
 ]

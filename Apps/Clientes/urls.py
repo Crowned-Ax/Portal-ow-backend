@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ClientListCreateView, ClientDetailView, ContactListCreateView, ContactDetailView
+from .views import ClientListCreateView, ClientDetailView, ContactListCreateView, ContactDetailView, ClientServiceViewSet
 
 urlpatterns = [
     path('', ClientListCreateView.as_view(), name='client-list-create'),
@@ -9,5 +9,7 @@ urlpatterns = [
     
     path('<int:client_id>/Access/', include('Apps.Accesos.urls')),
     path('<int:client_id>/Complements/', include('Apps.Complementos.urls')),
-    path('<int:client_id>/Services/', include('Apps.Servicios.urls')),
+    # Servicios del cliente
+    path('<int:client_id>/clientservices/', ClientServiceViewSet.as_view({'post': 'create'}), name='create-clientservice'),
+    path('<int:client_id>/clientservices/<int:pk>/', ClientServiceViewSet.as_view({'delete': 'destroy'}), name='delete-clientservice'),
 ]

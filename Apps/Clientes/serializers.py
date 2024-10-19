@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Client, Contact
+from ..Servicios.models import ClientService
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +49,8 @@ class ClientSerializer(serializers.ModelSerializer):
                 Contact.objects.create(cliente=instance, **contact_data)
 
         return instance
+
+class ClientServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientService
+        fields = ['client', 'service']
