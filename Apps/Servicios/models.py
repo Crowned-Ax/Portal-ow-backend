@@ -6,4 +6,7 @@ class Services(models.Model):
     description = models.TextField(blank=True)
     url = models.URLField(max_length=200, blank=True)
     img = models.ImageField(blank=True)
+
+class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)

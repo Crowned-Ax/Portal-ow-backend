@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import ServicesListCreateView, ServicesDetailView
+from .views import ClientServiceViewSet
+
 
 urlpatterns = [
-    path('', ServicesListCreateView.as_view(), name='services-list-create'),
-    path('<int:pk>/', ServicesDetailView.as_view(), name='services-detail'),
+    path('client/<int:client_id>/clientservices/', ClientServiceViewSet.as_view({'post': 'create'}), name='create-clientservice'),
+    path('client/<int:client_id>/clientservices/<int:pk>/', ClientServiceViewSet.as_view({'delete': 'destroy'}), name='delete-clientservice'),
 ]
