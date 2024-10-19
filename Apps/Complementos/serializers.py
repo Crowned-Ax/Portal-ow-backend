@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from .models import Complements
+from .models import Complements, ClientComplements
 
-class ComplementsSerializer(serializers.ModelSerializer):
+class ComplementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Complements
-        fields = ['id', 'name', 'description', 'url', 'img', 'client']
+        fields = '__all__'

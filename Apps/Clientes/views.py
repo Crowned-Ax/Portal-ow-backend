@@ -1,9 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Client, Contact
-from ..Servicios.models import ClientService
-from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer
+from .models import Client, Contact, ClientService, ClientComplement
+from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer, ClientComplementSerializer
 
 # Listar y crear clientes
 class ClientListCreateView(generics.ListCreateAPIView):
@@ -46,3 +45,9 @@ class ClientServiceViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ClientService.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class AddRemoveClientComplementView(generics.ListCreateAPIView, generics.DestroyAPIView):
+    queryset = ClientComplement.objects.all()
+    serializer_class = ClientComplementSerializer

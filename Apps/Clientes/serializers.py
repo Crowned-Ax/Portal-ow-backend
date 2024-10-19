@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Client, Contact
-from ..Servicios.models import ClientService
+from .models import Client, Contact, ClientService, ClientComplement
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,3 +53,8 @@ class ClientServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientService
         fields = ['client', 'service']
+
+class ClientComplementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientComplement
+        fields = ['client', 'complement']

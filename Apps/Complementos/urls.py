@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import ComplementsListCreateView, ComplementsDetailView
+from .views import ComplementListCreateView, ComplementDetailView
 
 urlpatterns = [
-    path('', ComplementsListCreateView.as_view(), name='complements-list-create'),
-    path('<int:pk>/', ComplementsDetailView.as_view(), name='complements-detail'),
+    path('', ComplementListCreateView.as_view(), name='complement-list'),
+    path('<int:pk>/', ComplementDetailView.as_view(), name='complement-detail'),
 ]

@@ -1,4 +1,6 @@
 from django.db import models
+from ..Servicios.models import Services
+from ..Complementos.models import Complements
 
 IDENTIFICACION_OPCIONES = [
     ('CC', 'Cédula de ciudadanía'),
@@ -84,3 +86,15 @@ class Contact(models.Model):
     tel = models.CharField(max_length=15, blank=True)
     eEmail = models.CharField(max_length=30, blank=True)
     birthday = models.DateField(null=True)
+
+
+class ClientService(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    service = models.ForeignKey(Services, on_delete=models.CASCADE)
+
+class ClientComplement(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    complement = models.ForeignKey(Complements, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('client', 'complement')
