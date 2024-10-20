@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Complements, ClientComplements
+from .models import Complements
 
 class ComplementSerializer(serializers.ModelSerializer):
     class Meta:
