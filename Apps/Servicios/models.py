@@ -1,9 +1,9 @@
 from django.db import models
 
 SER_CATEGORY = [
-    ('OK','OK Web'),
-    ('Comp','Complemento'),
-    ('Cons','Constructor'),
+    ('OK Web','OK Web'),
+    ('Complemento','Complemento'),
+    ('Constructor','Constructor'),
 ]
 
 class Services(models.Model):
