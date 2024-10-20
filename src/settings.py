@@ -106,7 +106,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # La URL de tu aplicación Angular
     "https://portal-ow-angular-750774405453.southamerica-east1.run.app",
     "https://okweb.one",
-    "http://localhost:8080/",
+    "http://localhost:8080",
 ]
 
 CORS_ALLOW_METHODS = [
