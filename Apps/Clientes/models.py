@@ -1,6 +1,8 @@
 from django.db import models
 from ..Servicios.models import Services
 from ..Complementos.models import Complements
+from django.utils import timezone
+from datetime import timedelta
 
 IDENTIFICACION_OPCIONES = [
     ('CC', 'Cédula de ciudadanía'),
@@ -91,6 +93,9 @@ class Contact(models.Model):
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
+    startDate = models.DateField(default=timezone.now) 
+    expirationDate = models.DateField(default=timezone.now() + timedelta(days=30)) 
+    price = models.IntegerField(default=0)
 
 class ClientComplement(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
