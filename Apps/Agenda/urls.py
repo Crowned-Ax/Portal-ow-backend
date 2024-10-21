@@ -6,7 +6,7 @@ from .views import ScheduleViewSet
 router = DefaultRouter()
 
 # Registrar el ViewSet en el router
-router.register(r'', ScheduleViewSet)
+router.register(r'agenda', ScheduleViewSet)
 
 # Incluir las URLs del router
 urlpatterns = [
