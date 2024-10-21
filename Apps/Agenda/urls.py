@@ -13,8 +13,8 @@ urlpatterns = [
     path('', include(router.urls)),
 ]
 
-# las url se autogeneran aqui y son sencillas, basandose en la raiz "Agenda"
+# las url se autogeneran aqui y son sencillas, basandose en la raiz "schedule"
 # solo es cambiar los distintos tipos de peticion (POST, GET, PUT, etc)
 # y en los casos donde se requiere especificar como un PUT o DELETE
-# GET /Agenda/{id}/
+# GET /schedule/{id}/
 # es solo poner el id del item especifico
