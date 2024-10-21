@@ -1,7 +1,7 @@
 from django.db import models
 
 SER_CATEGORY = [
-    ('OK Web','OK Web'),
+    ('Ok Web','Ok Web'),
     ('Complemento','Complemento'),
     ('Constructor','Constructor'),
 ]
