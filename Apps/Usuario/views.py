@@ -1,6 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -27,6 +27,37 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
         return user
 
+class UserDeleteView(generics.DestroyAPIView):
+    queryset = User.objects.all()
+    permission_classes = [IsAdminUser]  # Solo un administrador puede eliminar usuarios
+
+    def get_object(self):
+        email = self.kwargs['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise generics.Http404
+        # Verifica permisos: solo un staff puede eliminar
+        if not self.request.user.is_staff:
+            raise PermissionDenied("Usted no tiene permisos para eliminar este perfil.")
+
+        return user
+
+class CreateUserView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]  # Solo un administrador puede crear superusuarios
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.create_superuser(
+                email=serializer.validated_data['email'],
+                password=serializer.validated_data['password'],
+                **serializer.validated_data
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
