@@ -18,7 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=15, blank=True)
     eEmail_personal = models.EmailField(max_length=40, blank=True)
     eEmail_laboral = models.EmailField(max_length=40, blank=True)
-    birthday = models.DateField(null=True)
+    birthday = models.DateField(null=True, blank=True)
     documentType = models.CharField(
         choices=IDENTIFICACION_OPCIONES, 
         default='CC',
