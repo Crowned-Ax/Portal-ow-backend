@@ -10,7 +10,7 @@ class SocialNetworkSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     social_networks = SocialNetworkSerializer(many=True, read_only=True)
-    birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False)
     
     class Meta:
         model = User

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Client, Contact, ClientService, ClientComplement
 
 class ContactSerializer(serializers.ModelSerializer):
-    birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False)
     class Meta:
         model = Contact
         fields = ['id', 'cliente', 'name', 'lastname', 'tel', 'eEmail', 'birthday']
