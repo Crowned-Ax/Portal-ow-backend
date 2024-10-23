@@ -37,6 +37,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     formation = models.CharField(max_length=50, blank=True)
     knowledge = models.CharField(max_length=50, blank=True)
     skill = models.CharField(max_length=50, blank=True)
+    #
+    bank = models.CharField(max_length=50, blank=True)
+    numberBank = models.CharField(max_length=50, blank=True)
     # campos de admin
     is_staff = models.BooleanField(default=False)
 
