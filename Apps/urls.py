@@ -6,4 +6,5 @@ urlpatterns = [
     path('clients/', include('Apps.Clientes.urls')),
     path('', include('Apps.Servicios.urls')), #services
     path('complements/', include('Apps.Complementos.urls')), #complements
+    path('chat/', include('Apps.Chat.urls')),
 ]

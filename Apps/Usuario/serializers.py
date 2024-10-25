@@ -25,7 +25,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['email', 'fullname']
+        fields = ['email', 'fullname', 'position']
 
     def get_fullname(self, obj):
         return f"{obj.name} {obj.lastname}"

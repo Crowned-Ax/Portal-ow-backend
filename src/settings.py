@@ -54,6 +54,7 @@ LOCAL_APPS = [
     'Apps.Usuario',
     'Apps.Accesos',
     'Apps.Agenda',
+    'Apps.Chat',
     'Apps.Clientes',
     'Apps.Complementos',
     'Apps.Servicios'

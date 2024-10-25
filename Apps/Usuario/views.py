@@ -12,6 +12,10 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class SimpleUserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = SimpleUserSerializer
+
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
 
@@ -67,7 +71,8 @@ class RegisterView(generics.CreateAPIView):
         if serializer.is_valid():
             user = serializer.save()
             token = Token.objects.create(user=user)
-            return Response({'token': token.key }, status=status.HTTP_201_CREATED)
+            user_data = SimpleUserSerializer(user).data
+            return Response({'token': token.key, 'user': user_data }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(generics.GenericAPIView):
