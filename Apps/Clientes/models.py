@@ -22,10 +22,10 @@ CONTRIBUYENTE_OPCIONES = [
     ('Natural', 'Pesona natural')
 ]
 TAX_OPCIONES = [
-    ('01', 'IVA impuesto sobre las ventas'),
-    ('04', 'INC impuesto nacional al consumo'),
-    ('ZA', 'IVA - INC'),
-    ('ZZ', 'No aplica')
+    ('IVA', 'IVA impuesto sobre las ventas'),
+    ('INC', 'INC impuesto nacional al consumo'),
+    ('IVA-INC', 'IVA - INC'),
+    ('N/A', 'No aplica')
 ]
 TAX_ID_OPCIONES = [
     ('01','Gran contribuyente'),
@@ -39,47 +39,58 @@ TAX_ID_OPCIONES = [
 
 
 class Client(models.Model):
-    mark_name = models.CharField(max_length=30, blank=False)
+    name = models.CharField(max_length=30, blank=True)
+    lastname = models.CharField(max_length=30, blank=True)
+    description = models.TextField(blank=True)
     tributare_type_id = models.CharField(
         choices=IDENTIFICACION_OPCIONES, 
         default='CC',
         max_length=5,
         verbose_name='Tipo de Identificación Tributaria'
     )
+    # Informacion basica
     id_number = models.CharField(max_length=15, blank=False)
-    corporate_name = models.CharField(max_length=30, blank=False) 
-    company_name = models.CharField(max_length=30, blank=False)
-    regime_type = models.CharField(
-        choices=REGIMEN_OPCIONES, 
-        default='IVA',
-        max_length=7,
-        verbose_name='Tipo de regimen'
-    )
+    email = models.EmailField(blank=True)
+    country = models.CharField(max_length=30, blank=True)
+    department = models.CharField(max_length=30, blank=True)
+    city = models.CharField(max_length=30, blank=True)
+    address = models.CharField(max_length=30, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    position = models.CharField(max_length=30, blank=True)
+    # Informacion tributaria
+    mark_name = models.CharField(max_length=30, blank=True)
+    corporate_name = models.CharField(max_length=30, blank=True) 
+    company_name = models.CharField(max_length=30, blank=True)
     taxpayer_type = models.CharField(
         choices=CONTRIBUYENTE_OPCIONES, 
-        default='IVA',
+        default='Natural',
         max_length=10,
         verbose_name='Tipo de contribuyente'
     )
     tax_liability = models.CharField(
         choices=TAX_OPCIONES, 
         default='IVA',
-        max_length=3,
+        max_length=8,
         verbose_name='Responsabilidad tributaria'
     )
     tax_id_type = models.CharField(
         choices=TAX_ID_OPCIONES, 
-        default='IVA',
+        default='01',
         max_length=55,
-        verbose_name='Tipo de identificacion tributaria'
+        verbose_name='Tipo de identificacion tributaria 2'
     )
-    eEmail = models.EmailField(blank=True)
-    tel = models.CharField(max_length=15, blank=True)
-    country = models.CharField(max_length=30, blank=True)
-    department = models.CharField(max_length=30, blank=True)
-    city = models.CharField(max_length=30, blank=True)
-    address = models.CharField(max_length=30, blank=True)
+    regime_type = models.CharField(
+        choices=REGIMEN_OPCIONES, 
+        default='IVA',
+        max_length=7,
+        verbose_name='Tipo de regimen'
+    )
 
+
+class TaxPayer(models.Model):
+    paymentDate = models.DateField(default=timezone.now)
+    amount = models.IntegerField(default=0)
+    paymentMethod = models.CharField(max_length=30)
 
 class Contact(models.Model):
     cliente = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='Contactos')

@@ -10,16 +10,15 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class ClientSerializer(serializers.ModelSerializer):
     # Incluir contactos como un nested serializer
-    contactos = ContactSerializer(many=True, required=False, source='Contactos')
+    contactos = serializers.SerializerMethodField()
     
     class Meta:
         model = Client
-        fields = [
-            'id', 'mark_name', 'tributare_type_id', 'id_number', 'corporate_name', 
-            'company_name', 'regime_type', 'taxpayer_type', 'tax_liability', 
-            'tax_id_type', 'eEmail', 'tel', 'country', 'department', 
-            'city', 'address', 'contactos'
-        ]
+        fields = "__all__"
+
+    def get_contactos(self, obj):
+        contacts = obj.Contactos.all()
+        return ContactSerializer(contacts, many=True).data
 
     def create(self, validated_data):
         contactos_data = validated_data.pop('Contactos', [])
