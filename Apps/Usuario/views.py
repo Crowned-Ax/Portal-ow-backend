@@ -9,8 +9,10 @@ from .models import User
 from .serializers import UserSerializer, LoginSerializer, SimpleUserSerializer
 
 class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
+    def get_queryset(self):
+        # Excluir al usuario que hace la petición
+        return User.objects.exclude(email=self.request.user.email)
 
 class SimpleUserListView(generics.ListAPIView):
     queryset = User.objects.all()
@@ -26,9 +28,10 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
         except User.DoesNotExist:
             raise generics.Http404
         # Verifica permisos: el usuario autenticado debe ser el mismo usuario o un staff
+        """
         if user != self.request.user and not self.request.user.is_staff:
             raise PermissionDenied("Usted no tiene permisos para editar este perfil.")
-
+        """
         return user
 
 class UserDeleteView(generics.DestroyAPIView):
@@ -87,23 +90,8 @@ class LoginView(generics.GenericAPIView):
         user_data = SimpleUserSerializer(user).data
         return Response({'token': token.key, 'user': user_data})
     
-class ChangePasswordView(APIView):
+class ProfileView(generics.UpdateAPIView):
+    serializer_class = UserSerializer  
 
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        current_password = request.data.get("current_password")
-        new_password = request.data.get("new_password")
-
-        # Verificar que la contraseña actual coincida
-        if not check_password(current_password, user.password):
-            return Response({"detail": "La contraseña actual no es correcta."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Verificar que la nueva contraseña cumpla con los requisitos mínimos
-        if not new_password or len(new_password) < 8:
-            return Response({"detail": "La nueva contraseña debe tener al menos 8 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Cambiar la contraseña del usuario
-        user.set_password(new_password)
-        user.save()
-
-        return Response({"detail": "La contraseña ha sido cambiada exitosamente."}, status=status.HTTP_200_OK)
+    def get_object(self):
+        return self.request.user
