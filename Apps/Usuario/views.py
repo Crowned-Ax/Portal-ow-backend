@@ -90,8 +90,19 @@ class LoginView(generics.GenericAPIView):
         user_data = SimpleUserSerializer(user).data
         return Response({'token': token.key, 'user': user_data})
     
-class ProfileView(generics.UpdateAPIView):
-    serializer_class = UserSerializer  
+class ChangePasswordView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        current_password = request.data.get("currentPassword")
+        new_password = request.data.get("newPassword")
 
-    def get_object(self):
-        return self.request.user
+        # Verificar que la contraseña actual coincida
+        if not check_password(current_password, user.password):
+            return Response({"detail": "La contraseña actual no es correcta."}, status=status.HTTP_400_BAD_REQUEST)
+        # Verificar que la nueva contraseña cumpla con los requisitos mínimos
+        if not new_password or len(new_password) < 8:
+            return Response({"detail": "La nueva contraseña debe tener al menos 8 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
+        # Cambiar la contraseña del usuario
+        user.set_password(new_password)
+        user.save()
+        return Response({"detail": "La contraseña ha sido cambiada exitosamente."}, status=status.HTTP_200_OK)

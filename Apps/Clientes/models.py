@@ -18,8 +18,8 @@ REGIMEN_OPCIONES = [
     ('No IVA', 'Responsable de NO IVA')
 ]
 CONTRIBUYENTE_OPCIONES = [
-    ('Juridico', 'Pesona juridica'),
-    ('Natural', 'Pesona natural')
+    ('Juridico', 'Persona juridica'),
+    ('Natural', 'Persona natural')
 ]
 TAX_OPCIONES = [
     ('IVA', 'IVA impuesto sobre las ventas'),
@@ -96,8 +96,8 @@ class Contact(models.Model):
     cliente = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='Contactos')
     name = models.CharField(max_length=30, blank=True)
     lastname = models.CharField(max_length=30, blank=True)
-    tel = models.CharField(max_length=15, blank=True)
-    eEmail = models.CharField(max_length=30, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    email = models.CharField(max_length=30, blank=True)
     birthday = models.DateField(null=True)
 
 
