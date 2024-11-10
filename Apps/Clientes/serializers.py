@@ -5,7 +5,7 @@ class ContactSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False)
     class Meta:
         model = Contact
-        fields = ['id', 'cliente', 'name', 'lastname', 'tel', 'eEmail', 'birthday']
+        fields = ['id', 'cliente', 'name', 'lastname', 'phone', 'email', 'birthday']
         extra_kwargs = {'cliente': {'write_only': True}}
 
 class ClientSerializer(serializers.ModelSerializer):
