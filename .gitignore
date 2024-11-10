@@ -1,7 +1,18 @@
-.env
+# Django #
+*.log
+*.pot
 *.pyc
-.pyc
 __pycache__
+# Extra
+.env
 venv
-*/migrations/*
+migrations/
 !*/migrations/__init__.py
+
+# Visual Studio Code # 
+.vscode/* 
+!.vscode/settings.json 
+!.vscode/tasks.json 
+!.vscode/launch.json 
+!.vscode/extensions.json 
+.history
