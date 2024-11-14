@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Client, Contact, ClientService, ClientComplement
+from .models import Client, Contact, ClientService
 
 class ContactSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False)
@@ -52,11 +52,8 @@ class ClientSerializer(serializers.ModelSerializer):
 class ClientServiceSerializer(serializers.ModelSerializer):
     startDate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
     expirationDate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    name = serializers.CharField(source='service.__str__', read_only=True)
+
     class Meta:
         model = ClientService
-        fields = ['client', 'service']
-
-class ClientComplementSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ClientComplement
-        fields = ['client', 'complement']
+        fields = ['id','client', 'service', 'price', 'startDate', 'expirationDate', 'name']

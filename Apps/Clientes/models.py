@@ -1,6 +1,5 @@
 from django.db import models
 from ..Servicios.models import Services
-from ..Complementos.models import Complements
 from django.utils import timezone
 from datetime import timedelta
 
@@ -42,14 +41,14 @@ class Client(models.Model):
     name = models.CharField(max_length=30, blank=True)
     lastname = models.CharField(max_length=30, blank=True)
     description = models.TextField(blank=True)
-    tributare_type_id = models.CharField(
+    documentType = models.CharField(
         choices=IDENTIFICACION_OPCIONES, 
         default='CC',
         max_length=5,
-        verbose_name='Tipo de Identificación Tributaria'
+        verbose_name='Tipo de Identificación'
     )
     # Informacion basica
-    id_number = models.CharField(max_length=15, blank=False)
+    documentNumber = models.CharField(max_length=15, blank=False)
     email = models.EmailField(blank=True)
     country = models.CharField(max_length=30, blank=True)
     department = models.CharField(max_length=30, blank=True)
@@ -101,17 +100,9 @@ class Contact(models.Model):
     email = models.CharField(max_length=30, blank=True)
     birthday = models.DateField(null=True)
 
-
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
     startDate = models.DateField(default=timezone.now) 
     expirationDate = models.DateField(default=timezone.now() + timedelta(days=30)) 
     price = models.IntegerField(default=0)
-
-class ClientComplement(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    complement = models.ForeignKey(Complements, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('client', 'complement')

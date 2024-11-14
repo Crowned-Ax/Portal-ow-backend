@@ -4,6 +4,7 @@ SER_CATEGORY = [
     ('Ok Web','Ok Web'),
     ('Complemento','Complemento'),
     ('Constructor','Constructor'),
+    ('Temas','Temas'),
 ]
 
 class Services(models.Model):
@@ -16,3 +17,5 @@ class Services(models.Model):
         max_length=12,
         verbose_name='Categoria del servicio'
     )
+    def __str__(self):
+        return f"{self.name}"
