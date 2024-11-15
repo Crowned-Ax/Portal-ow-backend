@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ClientListCreateView, ClientDetailView, ContactListCreateView, ContactDetailView, ClientServiceViewSet
+from .views import ClientListCreateView, ClientDetailView, ContactListCreateView, ContactDetailView, ClientServiceViewSet, SimpleClientView
 
 urlpatterns = [
     path('<int:pk>/', ClientDetailView.as_view(), name='client-detail'),
@@ -15,5 +15,6 @@ urlpatterns = [
          ClientServiceViewSet.as_view({'delete': 'destroy', 'put': 'update'}), 
          name='clientservice-detail-update'),
     #Principal
-    path('', ClientListCreateView.as_view(), name='client-list-create')
+    path('', ClientListCreateView.as_view(), name='client-list-create'),
+    path('simple/', SimpleClientView.as_view(), name='simple-client-list')#clientes simplificados
 ]

@@ -2,7 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import generics
 from .models import Client, Contact, ClientService
-from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer
+from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer, SimpleClientSerializer
+from rest_framework.generics import ListAPIView
+
+# Cliente simplificado
+class SimpleClientView(ListAPIView):
+    queryset = Client.objects.all()
+    serializer_class = SimpleClientSerializer
 
 # Listar y crear clientes
 class ClientListCreateView(generics.ListCreateAPIView):

@@ -8,6 +8,15 @@ class ContactSerializer(serializers.ModelSerializer):
         fields = ['id', 'cliente', 'name', 'lastname', 'phone', 'email', 'birthday']
         extra_kwargs = {'cliente': {'write_only': True}}
 
+class SimpleClientSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
+    class Meta:
+        model = Client
+        fields = ['id','fullname']
+    
+    def get_fullname(self, obj):
+        return f"{obj.name} {obj.lastname}"
+
 class ClientSerializer(serializers.ModelSerializer):
     # Incluir contactos como un nested serializer
     contactos = serializers.SerializerMethodField()
