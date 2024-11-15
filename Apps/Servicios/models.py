@@ -10,7 +10,7 @@ SER_CATEGORY = [
 class Services(models.Model):
     name = models.CharField(max_length=40, blank=True)
     description = models.TextField(blank=True)
-    img = models.ImageField(upload_to='images/', blank=True, null=True)
+    img = models.CharField(max_length=50,blank=True,null=True)
     category = models.CharField(
         choices=SER_CATEGORY, 
         default='OK',
