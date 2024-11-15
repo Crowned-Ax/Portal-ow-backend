@@ -21,3 +21,4 @@ class PaymentHistory(models.Model):
     bank = models.CharField(max_length=40)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    price = models.IntegerField(default=0)
