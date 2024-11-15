@@ -56,7 +56,7 @@ class Client(models.Model):
     address = models.CharField(max_length=30, blank=True)
     phone = models.CharField(max_length=15, blank=True)
     position = models.CharField(max_length=30, blank=True)
-    photo = models.CharField(max_length=40, blank=True, null=True)
+    photo = models.URLField(blank=True,null=True)
     # Informacion tributaria
     mark_name = models.CharField(max_length=30, blank=True)
     corporate_name = models.CharField(max_length=30, blank=True) 
