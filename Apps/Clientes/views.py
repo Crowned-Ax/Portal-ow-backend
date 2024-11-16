@@ -54,12 +54,12 @@ class ClientServiceViewSet(viewsets.ViewSet):
         # Filtrar registros donde la categoría del servicio no sea "Ok Web"
         services_not_ok_web = ClientService.objects.filter(
             client_id=client_id
-        ).exclude(service__category="Ok Web")
+        ).exclude(service__category="Servicios")
         
         # Filtrar registros donde la categoría del servicio sea "Ok Web"
         services_ok_web = ClientService.objects.filter(
             client_id=client_id,
-            service__category="Ok Web"
+            service__category="Servicios"
         )
 
         # Serializar ambas listas
