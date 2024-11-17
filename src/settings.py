@@ -106,7 +106,7 @@ WSGI_APPLICATION = 'src.wsgi.application'
 #CORS compatibilidad peticiones entre aplicaciones
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # La URL de tu aplicación Angular
-    "https://staging.d1fslohnaqvflh.amplifyapp.com/registro",
+    "https://staging.d1fslohnaqvflh.amplifyapp.com",
     "https://okweb.one",
     "http://localhost:8080",
 ]
