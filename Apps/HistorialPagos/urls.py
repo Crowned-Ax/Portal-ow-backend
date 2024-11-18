@@ -5,6 +5,7 @@ from .views import PaymentHistoryViewSet
 router = DefaultRouter()
 router.register(r'payment-history', PaymentHistoryViewSet)
 # Hacer las peticiones crud normal a payment-history y filtrado por cliente a payment-history/client/id
+# payment-history/collaborator/id
 urlpatterns = [
     path('', include(router.urls)),
 ]
