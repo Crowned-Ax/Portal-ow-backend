@@ -18,7 +18,7 @@ class PaymentHistoryViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(payments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['get'], url_path='collaborator/(?P<collabo_id>[^/.]+)')
+    @action(detail=False, methods=['get'], url_path='collaborator/(?P<collabo_id>[^/]+)')
     def by_collaborator(self, request, collabo_id=None):
         collabo = get_object_or_404(User, email=collabo_id)
         payments = PaymentHistory.objects.filter(collaborator=collabo)
