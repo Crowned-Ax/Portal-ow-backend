@@ -10,8 +10,8 @@ class ServicesViewSet(viewsets.ModelViewSet):
 class ServicesFiltered(viewsets.ViewSet):
         
     def list(self, request, client_id=None):
-        servword = Services.objects.all().exclude(category = "Servicios")
-        servservice = Services.objects.filter(category = "Servicios")
+        servword = Services.objects.all().exclude(category = "Ok Web")
+        servservice = Services.objects.filter(category = "Ok Web")
 
         serializer_serv_service = ServicesSerializer(servservice, many=True)
         serializer_serv_word = ServicesSerializer(servword, many=True)
