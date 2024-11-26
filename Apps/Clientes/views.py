@@ -2,8 +2,10 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import generics
 from .models import Client, Contact, ClientService
+from ..HistorialPagos.models import PaymentHistory
 from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer, SimpleClientSerializer
 from rest_framework.generics import ListAPIView
+from django.utils.timezone import now
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
@@ -36,8 +38,17 @@ class ClientServiceViewSet(viewsets.ViewSet):
         serializer = ClientServiceSerializer(data=data)
         if serializer.is_valid():
             try:
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                client_service = serializer.save()
+
+                PaymentHistory.objects.create(
+                    date=now().date(),
+                    time=now().time(),
+                    service=client_service.service,
+                    client=client_service.client,  
+                    price=client_service.price,  
+                    is_payed=client_service.is_payed,  
+                )
+                return Response(client_service.data, status=status.HTTP_201_CREATED)
             except Client.DoesNotExist:
                 return Response({'error': 'Cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -77,7 +88,21 @@ class ClientServiceViewSet(viewsets.ViewSet):
             client_service = ClientService.objects.get(id=pk, client_id=client_id)
             serializer = ClientServiceSerializer(client_service, data=request.data, partial=True)
             if serializer.is_valid():
+                 # Verificar si hay cambios en is_payed
+                is_payed_original = client_service.is_payed
+                is_payed_nuevo = request.data.get("is_payed", is_payed_original)
+
+                # Actualizar ClientService
                 serializer.save()
+                
+                # Solo actualiza PaymentHistory si is_payed cambia
+                if is_payed_original != is_payed_nuevo:
+                    PaymentHistory.objects.filter(
+                        service=client_service.service,
+                        client=client_service.client,
+                        price=client_service.price
+                    ).update(is_payed=is_payed_nuevo, date=now().date(), time=now().time() )
+                    
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ClientService.DoesNotExist:

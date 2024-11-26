@@ -7,7 +7,7 @@ from .serializers import HistorySerializer
 from ..Clientes.models import Client
 from ..Usuario.models import User
 
-class PaymentHistoryViewSet(viewsets.ModelViewSet):
+class PaymentHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PaymentHistory.objects.all()
     serializer_class = HistorySerializer
 
