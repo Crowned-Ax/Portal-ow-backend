@@ -106,3 +106,5 @@ class ClientService(models.Model):
     startDate = models.DateField(default=timezone.now) 
     expirationDate = models.DateField(default=timezone.now() + timedelta(days=30)) 
     price = models.IntegerField(default=0)
+    is_recurrent = models.BooleanField(default=False)
+    is_payed = models.BooleanField(default=False)

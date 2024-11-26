@@ -13,7 +13,7 @@ class Services(models.Model):
     img = models.CharField(max_length=50,blank=True,null=True)
     category = models.CharField(
         choices=SER_CATEGORY, 
-        default='OK',
+        default='OK Web',
         max_length=12,
         verbose_name='Categoria del servicio'
     )
