@@ -36,6 +36,10 @@ TAX_ID_OPCIONES = [
     ('07','Otros')
 ]
 
+RECURRENCE_OPCIONES = [
+    ('Mensual', 'Mensual'),
+    ('Anual', 'Anual')
+]
 
 class Client(models.Model):
     name = models.CharField(max_length=30, blank=True)
@@ -107,4 +111,10 @@ class ClientService(models.Model):
     expirationDate = models.DateField(default=timezone.now() + timedelta(days=30)) 
     price = models.IntegerField(default=0)
     is_recurrent = models.BooleanField(default=False)
+    recurrence = models.CharField(
+        choices=RECURRENCE_OPCIONES, 
+        default='Mensual',
+        max_length=8,
+        verbose_name='Recurrencia'
+    )
     is_payed = models.BooleanField(default=False)
