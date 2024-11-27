@@ -36,7 +36,7 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
 class UserDeleteView(generics.DestroyAPIView):
     queryset = User.objects.all()
-    permission_classes = [IsAdminUser]  # Solo un administrador puede eliminar usuarios
+    #permission_classes = [IsAdminUser]  # Solo un administrador puede eliminar usuarios
 
     def get_object(self):
         email = self.kwargs['email']
@@ -45,8 +45,8 @@ class UserDeleteView(generics.DestroyAPIView):
         except User.DoesNotExist:
             raise generics.Http404
         # Verifica permisos: solo un staff puede eliminar
-        if not self.request.user.is_staff:
-            raise PermissionDenied("Usted no tiene permisos para eliminar este perfil.")
+        #if not self.request.user.is_staff:
+            #raise PermissionDenied("Usted no tiene permisos para eliminar este perfil.")
 
         return user
 
