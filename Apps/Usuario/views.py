@@ -52,7 +52,7 @@ class UserDeleteView(generics.DestroyAPIView):
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAdminUser]  # Solo un administrador puede crear superusuarios
+    #permission_classes = [IsAdminUser]  # Solo un administrador puede crear superusuarios
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
