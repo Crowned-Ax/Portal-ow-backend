@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 
 class PaymentHistory(models.Model):
     date = models.DateField(default=timezone.now) 
-    time = models.TimeField()
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     collaborator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

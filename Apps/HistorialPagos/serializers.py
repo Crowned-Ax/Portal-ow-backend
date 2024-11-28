@@ -9,7 +9,7 @@ class HistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PaymentHistory
-        fields = ['date', 'time', 'service', 'client', 'collaborator', 'price', 'is_payed', 'clientName', 'collaboratorName', 'serviceName']
+        fields = ['date', 'service', 'client', 'collaborator', 'price', 'is_payed', 'clientName', 'collaboratorName', 'serviceName']
 
     def get_clientName(self, obj):
         client = obj.client
