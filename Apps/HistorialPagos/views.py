@@ -10,13 +10,13 @@ from ..Usuario.models import User
 class PaymentHistoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PaymentHistory.objects.all()
     serializer_class = HistorySerializer
-    @action(detail=False, methods=['get'], url_path='clients/')
+    @action(detail=False, methods=['get'], url_path='clients')
     def by_clients(self, request):
         payments = PaymentHistory.objects.filter(collaborator=None)
         serializer = self.get_serializer(payments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['get'], url_path='collaborator/')
+    @action(detail=False, methods=['get'], url_path='collaborators')
     def by_collaborators(self, request):
         payments = PaymentHistory.objects.filter(client=None)
         serializer = self.get_serializer(payments, many=True)
