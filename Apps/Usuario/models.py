@@ -40,7 +40,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     skill = models.CharField(max_length=50, blank=True)
     #
     bank = models.CharField(max_length=50, blank=True)
-    numberBank = models.CharField(max_length=50, blank=True)
+    accountNumber = models.CharField(max_length=50, blank=True)
+    accountType = models.CharField(max_length=50, blank=True)
+    holderBank = models.CharField(max_length=50, blank=True)
     # campos de admin
     is_staff = models.BooleanField(default=False)
 
