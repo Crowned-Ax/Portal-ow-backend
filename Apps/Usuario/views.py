@@ -57,10 +57,19 @@ class CreateUserView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
+            validated_data = serializer.validated_data.copy()  # Hacer una copia
+            
+            email = validated_data.pop('email')
+            password = validated_data.pop('password') 
+            validated_data.pop('is_staff')
+            validated_data.pop('is_superuser')
+            validated_data.pop('groups')
+            validated_data.pop('user_permissions')
+
             user = User.objects.create_superuser(
-                email=serializer.validated_data['email'],
-                password=serializer.validated_data['password'],
-                **serializer.validated_data
+                email=email,
+                password=password,
+                **validated_data
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
