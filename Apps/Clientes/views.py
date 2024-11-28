@@ -48,7 +48,8 @@ class ClientServiceViewSet(viewsets.ViewSet):
                     price=client_service.price,  
                     is_payed=client_service.is_payed,  
                 )
-                return Response(client_service.data, status=status.HTTP_201_CREATED)
+                client_service_serializer = ClientServiceSerializer(client_service)
+                return Response(client_service_serializer.data, status=status.HTTP_201_CREATED)
             except Client.DoesNotExist:
                 return Response({'error': 'Cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
