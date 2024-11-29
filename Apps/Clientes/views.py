@@ -42,7 +42,6 @@ class ClientServiceViewSet(viewsets.ViewSet):
 
                 PaymentHistory.objects.create(
                     date=now().date(),
-                    time=now().time(),
                     service=client_service.service,
                     client=client_service.client,  
                     price=client_service.price,  
