@@ -6,6 +6,8 @@ from ..HistorialPagos.models import PaymentHistory
 from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer, SimpleClientSerializer
 from rest_framework.generics import ListAPIView
 from django.utils.timezone import now
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
@@ -35,27 +37,73 @@ class ClientServiceViewSet(viewsets.ViewSet):
     def create(self, request, client_id=None):
         data = request.data
         data["client"] = client_id
-        serializer = ClientServiceSerializer(data=data)
-        if serializer.is_valid():
-            try:
-                client_service = serializer.save()
+        cantidad = int(data.get("Nrecurrency", 1))  # Cantidad de servicios a crear
+        recurrence = data.get("recurrence", "Mensual")  # Recurrencia (Mensual o Anual)
 
+        try:
+            # Validamos la existencia del cliente
+            Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({'error': 'Cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Validamos el serializer una sola vez para la estructura base
+        serializer = ClientServiceSerializer(data=data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Definimos el delta en función de la recurrencia
+        if recurrence == "Mensual":
+            delta = relativedelta(months=1)
+        elif recurrence == "Anual":
+            delta = relativedelta(years=1)
+        else:
+            return Response({'error': 'Periodo no válida.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        created_services = []  # Lista para almacenar los servicios creados
+
+        # Obtenemos las fechas iniciales del primer servicio
+        current_start_date = serializer.validated_data["startDate"]
+        current_expiration_date = serializer.validated_data["startDate"] + delta
+
+        for i in range(cantidad):
+            # Actualizamos las fechas dinámicamente
+            data["startDate"] = current_start_date
+            data["expirationDate"] = current_expiration_date
+
+            # Serializamos y guardamos el nuevo ClientService
+            service_serializer = ClientServiceSerializer(data=data)
+            if service_serializer.is_valid():
+                client_service = service_serializer.save()
+                created_services.append(client_service)
+
+                # Creamos el registro de PaymentHistory
                 PaymentHistory.objects.create(
                     date=now().date(),
                     service=client_service.service,
-                    client=client_service.client,  
-                    price=client_service.price,  
-                    is_payed=client_service.is_payed,  
+                    client=client_service.client,
+                    clientService=client_service,
+                    price=client_service.price,
+                    is_payed=client_service.is_payed,
                 )
-                client_service_serializer = ClientServiceSerializer(client_service)
-                return Response(client_service_serializer.data, status=status.HTTP_201_CREATED)
-            except Client.DoesNotExist:
-                return Response({'error': 'Cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                # Actualizamos las fechas para el próximo servicio
+                current_start_date += delta
+                current_expiration_date += delta
+            else:
+                return Response(service_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # Serializamos todos los servicios creados para la respuesta
+        serialized_services = ClientServiceSerializer(created_services, many=True)
+        return Response(serialized_services.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, client_id=None, pk=None):
         try:
+            history = PaymentHistory.objects.filter(clientService=pk).first()
             client_service = ClientService.objects.get(id=pk, client_id=client_id)
+
+            if(history and not client_service.is_payed):
+                history.delete()
+
             client_service.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ClientService.DoesNotExist:
@@ -82,28 +130,53 @@ class ClientServiceViewSet(viewsets.ViewSet):
             'wordpress': serializer_not_ok_web.data,
             'servicios': serializer_ok_web.data
         })
-
+        
     def update(self, request, client_id=None, pk=None):
+        data = request.data
         try:
+            # Obtenemos el `ClientService` que se va a actualizar
             client_service = ClientService.objects.get(id=pk, client_id=client_id)
-            serializer = ClientServiceSerializer(client_service, data=request.data, partial=True)
-            if serializer.is_valid():
-                 # Verificar si hay cambios en is_payed
-                is_payed_original = client_service.is_payed
-                is_payed_nuevo = request.data.get("is_payed", is_payed_original)
 
-                # Actualizar ClientService
-                serializer.save()
-                
-                # Solo actualiza PaymentHistory si is_payed cambia
+            # Calculamos el nuevo `expirationDate` basado en el `startDate`
+            recurrence = data.get("recurrence", client_service.recurrence)
+            start_date = data.get("startDate", client_service.startDate)  # Obtenemos startDate del request o del objeto
+            if isinstance(start_date, str):
+                start_date = datetime.strptime(start_date, "%d/%m/%Y").date()
+
+            # Definimos el delta en función de la recurrencia
+            if recurrence == "Mensual":
+                delta = relativedelta(months=1)
+            elif recurrence == "Anual":
+                delta = relativedelta(years=1)
+            else:
+                return Response({'error': 'Recurrencia no válida.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            expiration_date = start_date + delta
+            data["expirationDate"] = expiration_date
+
+            # Actualizamos el `ClientService` con el serializer
+            serializer = ClientServiceSerializer(client_service, data=data, partial=True)
+            if serializer.is_valid():
+                # Verificar si hay cambios en `is_payed`
+                is_payed_original = client_service.is_payed
+                is_payed_nuevo = data.get("is_payed", is_payed_original)
+
+                # Guardamos los cambios en el `ClientService`
+                updated_client_service = serializer.save()
+
+                # Actualizamos `PaymentHistory` si `is_payed` cambió
                 if is_payed_original != is_payed_nuevo:
-                    PaymentHistory.objects.filter(
-                        service=client_service.service,
-                        client=client_service.client,
-                        price=client_service.price
-                    ).update(is_payed=is_payed_nuevo, date=now().date(), time=now().time() )
-                    
-                return Response(serializer.data)
+                    try:
+                        payment_history = PaymentHistory.objects.get(clientService=updated_client_service)
+                        payment_history.is_payed = is_payed_nuevo
+                        payment_history.date = now().date()
+                        payment_history.save()
+                    except PaymentHistory.DoesNotExist:
+                        return Response({'error': 'Historial de pagos no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
         except ClientService.DoesNotExist:
             return Response({'error': 'Servicio de cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)

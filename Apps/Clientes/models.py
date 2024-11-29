@@ -104,11 +104,15 @@ class Contact(models.Model):
     email = models.CharField(max_length=30, blank=True)
     birthday = models.DateField(null=True)
 
+
+def default_expiration_date():
+    return timezone.now() + timedelta(days=30)
+
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
     startDate = models.DateField(default=timezone.now) 
-    expirationDate = models.DateField(default=timezone.now() + timedelta(days=30)) 
+    expirationDate = models.DateField(default=default_expiration_date)
     price = models.IntegerField(default=0)
     is_recurrent = models.BooleanField(default=False)
     recurrence = models.CharField(

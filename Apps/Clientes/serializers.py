@@ -60,7 +60,7 @@ class ClientSerializer(serializers.ModelSerializer):
 
 class ClientServiceSerializer(serializers.ModelSerializer):
     startDate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
-    expirationDate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"])
+    expirationDate = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False)
     name = serializers.CharField(source='service.__str__', read_only=True)
 
     class Meta:
