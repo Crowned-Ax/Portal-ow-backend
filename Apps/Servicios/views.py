@@ -4,14 +4,14 @@ from .serializers import ServicesSerializer
 from rest_framework.response import Response
 
 class ServicesViewSet(viewsets.ModelViewSet):
-    queryset = Services.objects.all()
+    queryset = Services.objects.all().order_by('-updated_at')
     serializer_class = ServicesSerializer
 
 class ServicesFiltered(viewsets.ViewSet):
         
     def list(self, request, client_id=None):
-        servword = Services.objects.all().exclude(category = "Ok Web")
-        servservice = Services.objects.filter(category = "Ok Web")
+        servword = Services.objects.all().exclude(category = "Ok Web").order_by('-updated_at')
+        servservice = Services.objects.filter(category = "Ok Web").order_by('-updated_at')
 
         serializer_serv_service = ServicesSerializer(servservice, many=True)
         serializer_serv_word = ServicesSerializer(servword, many=True)

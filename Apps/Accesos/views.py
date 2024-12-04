@@ -9,7 +9,7 @@ class AccessListCreateView(generics.ListCreateAPIView):
     serializer_class = AccessSerializer
     def get_queryset(self):
         client_id = self.kwargs['client_id']
-        return Access.objects.filter(client__id=client_id)
+        return Access.objects.filter(client__id=client_id).order_by('-updated_at')
 
     def perform_create(self, serializer):
         client_id = self.kwargs['client_id']

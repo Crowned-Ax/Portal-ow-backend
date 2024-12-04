@@ -65,6 +65,7 @@ class Client(models.Model):
     mark_name = models.CharField(max_length=30, blank=True)
     corporate_name = models.CharField(max_length=30, blank=True) 
     company_name = models.CharField(max_length=30, blank=True)
+    tributary_number = models.CharField(max_length=30, blank=True)
     taxpayer_type = models.CharField(
         choices=CONTRIBUYENTE_OPCIONES, 
         default='Natural',
@@ -89,21 +90,8 @@ class Client(models.Model):
         max_length=7,
         verbose_name='Tipo de regimen'
     )
-
-
-class TaxPayer(models.Model):
-    paymentDate = models.DateField(default=timezone.now)
-    amount = models.IntegerField(default=0)
-    paymentMethod = models.CharField(max_length=30)
-
-class Contact(models.Model):
-    cliente = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='Contactos')
-    name = models.CharField(max_length=30, blank=True)
-    lastname = models.CharField(max_length=30, blank=True)
-    phone = models.CharField(max_length=15, blank=True)
-    email = models.CharField(max_length=30, blank=True)
-    birthday = models.DateField(null=True)
-
+    # interno
+    updated_at = models.DateTimeField(auto_now=True)
 
 def default_expiration_date():
     return timezone.now() + timedelta(days=30)
@@ -122,3 +110,5 @@ class ClientService(models.Model):
         verbose_name='Recurrencia'
     )
     is_payed = models.BooleanField(default=False)
+    #interno
+    updated_at = models.DateTimeField(auto_now=True) 

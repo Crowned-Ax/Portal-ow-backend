@@ -11,12 +11,12 @@ from datetime import datetime
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
-    queryset = Client.objects.all()
+    queryset = Client.objects.all().order_by('-updated_at')
     serializer_class = SimpleClientSerializer
 
 # Listar y crear clientes
 class ClientListCreateView(generics.ListCreateAPIView):
-    queryset = Client.objects.all()
+    queryset = Client.objects.all().order_by('-updated_at')
     serializer_class = ClientSerializer
 
 # Obtener, actualizar y eliminar un cliente específico
@@ -104,13 +104,13 @@ class ClientServiceViewSet(viewsets.ViewSet):
         # Filtrar registros donde la categoría del servicio no sea "Ok Web"
         services_not_ok_web = ClientService.objects.filter(
             client_id=client_id
-        ).exclude(service__category="Ok Web")
+        ).exclude(service__category="Ok Web").order_by('-updated_at')
         
         # Filtrar registros donde la categoría del servicio sea "Ok Web"
         services_ok_web = ClientService.objects.filter(
             client_id=client_id,
             service__category="Ok Web"
-        )
+        ).order_by('-updated_at')
 
         # Serializar ambas listas
         serializer_not_ok_web = ClientServiceSerializer(services_not_ok_web, many=True)

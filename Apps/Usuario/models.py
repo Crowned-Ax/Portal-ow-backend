@@ -45,7 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     holderBank = models.CharField(max_length=50, blank=True)
     # campos de admin
     is_staff = models.BooleanField(default=False)
-
+    #interno
+    updated_at = models.DateTimeField(auto_now=True) 
     USERNAME_FIELD = 'email'
     objects = UserManager()
 

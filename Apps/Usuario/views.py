@@ -12,7 +12,7 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     def get_queryset(self):
         # Excluir al usuario que hace la petición
-        return User.objects.exclude(email=self.request.user.email)
+        return User.objects.exclude(email=self.request.user.email).order_by('-updated_at')
 
 class SimpleUserListView(generics.ListAPIView):
     queryset = User.objects.all()

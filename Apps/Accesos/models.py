@@ -23,3 +23,5 @@ class Access(models.Model):
         verbose_name='Tipo de Acceso'
     )
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    #interno
+    updated_at = models.DateTimeField(auto_now=True) 
