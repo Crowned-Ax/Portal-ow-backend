@@ -1,9 +1,9 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Client, Contact, ClientService
+from .models import Client, ClientService
 from ..HistorialPagos.models import PaymentHistory
-from .serializers import ClientSerializer, ContactSerializer, ClientServiceSerializer, SimpleClientSerializer
+from .serializers import ClientSerializer, ClientServiceSerializer, SimpleClientSerializer
 from rest_framework.generics import ListAPIView
 from django.utils.timezone import now
 from dateutil.relativedelta import relativedelta
@@ -23,15 +23,6 @@ class ClientListCreateView(generics.ListCreateAPIView):
 class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-
-# CRUD para Contact (si necesitas manejo independiente)
-class ContactListCreateView(generics.ListCreateAPIView):
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
-
-class ContactDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Contact.objects.all()
-    serializer_class = ContactSerializer
 
 class ClientServiceViewSet(viewsets.ViewSet):
     def create(self, request, client_id=None):

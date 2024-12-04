@@ -1,10 +1,8 @@
 from django.urls import path, include
-from .views import ClientListCreateView, ClientDetailView, ContactListCreateView, ContactDetailView, ClientServiceViewSet, SimpleClientView
+from .views import ClientListCreateView, ClientDetailView, ClientServiceViewSet, SimpleClientView
 
 urlpatterns = [
     path('<int:pk>/', ClientDetailView.as_view(), name='client-detail'),
-    path('contacts/', ContactListCreateView.as_view(), name='contact-list-create'),  # Opcional
-    path('contacts/<int:pk>/', ContactDetailView.as_view(), name='contact-detail'),  # Opcional
     #Accesos
     path('<int:client_id>/Access/', include('Apps.Accesos.urls')),
     # Servicios del cliente
