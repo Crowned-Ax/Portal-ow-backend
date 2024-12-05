@@ -65,6 +65,7 @@ class Client(models.Model):
     mark_name = models.CharField(max_length=30, blank=True)
     corporate_name = models.CharField(max_length=30, blank=True) 
     company_name = models.CharField(max_length=30, blank=True)
+    tributary_id = models.CharField(max_length=30, blank=True)
     tributary_number = models.CharField(max_length=30, blank=True)
     taxpayer_type = models.CharField(
         choices=CONTRIBUYENTE_OPCIONES, 
