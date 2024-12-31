@@ -1,9 +1,9 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authtoken.models import Token
 from .models import User
 from .serializers import UserSerializer, LoginSerializer, SimpleUserSerializer
@@ -82,9 +82,16 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            token = Token.objects.create(user=user)
+            # Generar tokens JWT
+            refresh = RefreshToken.for_user(user)
+            access = str(refresh.access_token)
+
             user_data = SimpleUserSerializer(user).data
-            return Response({'token': token.key, 'user': user_data }, status=status.HTTP_201_CREATED)
+            return Response({
+                'refresh': str(refresh),
+                'access': access,
+                'user': user_data
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(generics.GenericAPIView):
@@ -95,9 +102,16 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']  # El user validado viene del método validate_login
-        token, _ = Token.objects.get_or_create(user=user)
+        # Generar tokens JWT
+        refresh = RefreshToken.for_user(user)
+        access = str(refresh.access_token)
+
         user_data = SimpleUserSerializer(user).data
-        return Response({'token': token.key, 'user': user_data})
+        return Response({
+            'refresh': str(refresh),
+            'access': access,
+            'user': user_data
+        }, status=status.HTTP_200_OK)
     
 class ChangePasswordView(APIView):
     def post(self, request, *args, **kwargs):

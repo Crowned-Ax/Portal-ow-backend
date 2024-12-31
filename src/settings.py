@@ -45,7 +45,8 @@ DJANGO_APPS = [
 ]
 THIRD_PART_APP = [
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'storages',
 ]
@@ -65,11 +66,21 @@ INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PART_APP
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+}
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,  # Genera un nuevo refresh token con cada renovación
+    'BLACKLIST_AFTER_ROTATION': True,  # Invalida el refresh token anterior tras la rotación
+    'USER_ID_FIELD': 'email',  # Cambia esto al nombre de tu campo identificador
+    'USER_ID_CLAIM': 'user_id',  # Este es el nombre del claim en el token
 }
 
 MIDDLEWARE = [
