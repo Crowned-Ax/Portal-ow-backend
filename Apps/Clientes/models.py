@@ -13,10 +13,12 @@ IDENTIFICACION_OPCIONES = [
     ('NIUP', 'NIUP'),
 ]
 REGIMEN_OPCIONES = [
+    ('N/A', 'No aplica'),
     ('IVA', 'Responsable de IVA'),
     ('No IVA', 'Responsable de NO IVA')
 ]
 CONTRIBUYENTE_OPCIONES = [
+    ('N/A', 'No aplica'),
     ('Juridico', 'Persona juridica'),
     ('Natural', 'Persona natural')
 ]
