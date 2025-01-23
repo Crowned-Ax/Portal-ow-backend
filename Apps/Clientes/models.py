@@ -64,9 +64,9 @@ class Client(models.Model):
     position = models.CharField(max_length=30, blank=True)
     photo = models.ImageField(upload_to="Profile/Clients",blank=True,null=True)
     # Informacion tributaria
-    mark_name = models.CharField(max_length=30, blank=True)
-    corporate_name = models.CharField(max_length=30, blank=True) 
-    company_name = models.CharField(max_length=30, blank=True)
+    mark_name = models.CharField(max_length=100, blank=True)
+    corporate_name = models.CharField(max_length=100, blank=True) 
+    company_name = models.CharField(max_length=100, blank=True)
     tributary_id = models.CharField(max_length=30, blank=True)
     tributary_number = models.CharField(max_length=30, blank=True)
     taxpayer_type = models.CharField(
