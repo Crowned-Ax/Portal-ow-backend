@@ -8,7 +8,7 @@ SER_CATEGORY = [
 ]
 
 class Services(models.Model):
-    name = models.CharField(max_length=40, blank=True)
+    name = models.CharField(max_length=80, blank=True)
     description = models.TextField(blank=True)
     img = models.ImageField(upload_to="Services",blank=True,null=True)
     category = models.CharField(
