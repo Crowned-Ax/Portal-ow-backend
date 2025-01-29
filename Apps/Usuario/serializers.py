@@ -42,3 +42,19 @@ class LoginSerializer(serializers.Serializer):
         if user and user.is_active:
             return {'user': user}
         raise serializers.ValidationError("Invalid credentials")
+   
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No hay ningún usuario con este correo electrónico.")
+        return value
+
+class PasswordResetSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, data):
+        if 'new_password' not in data:
+            raise serializers.ValidationError("Se requiere una nueva contraseña.")
+        return data

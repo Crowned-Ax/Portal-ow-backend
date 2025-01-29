@@ -4,9 +4,14 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.authtoken.models import Token
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
 from .models import User
-from .serializers import UserSerializer, LoginSerializer, SimpleUserSerializer
+from .serializers import UserSerializer, LoginSerializer, SimpleUserSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
@@ -129,3 +134,58 @@ class ChangePasswordView(APIView):
         user.set_password(new_password)
         user.save()
         return Response({"detail": "La contraseña ha sido cambiada exitosamente."}, status=status.HTTP_200_OK)
+
+class PasswordResetRequestView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            user = get_object_or_404(User, email=email)
+
+            # Generar el token
+            token_generator = PasswordResetTokenGenerator()
+            token = token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # Construir el enlace de restablecimiento
+            frontend_url = "http://localhost:4200"
+            reset_url = f"{frontend_url}/reset-password/{uid}/{token}/"
+            from_email = settings.DEFAULT_FROM_EMAIL
+
+            # Enviar el correo
+            send_mail(
+                'Recuperación de contraseña',
+                f"Usa este enlace para restablecer tu contraseña: {reset_url}",
+                from_email,
+                [email],
+                fail_silently=False,
+            )
+
+            return Response({"message": "Correo de recuperación enviado."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        uidb64 = request.data.get("uid")
+        token = request.data.get("token")
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (User.DoesNotExist, ValueError, TypeError):
+            return Response({"error": "Token inválido."}, status=status.HTTP_400_BAD_REQUEST)
+
+        token_generator = PasswordResetTokenGenerator()
+        if not token_generator.check_token(user, token):
+            return Response({"error": "Token inválido o expirado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({"message": "Contraseña actualizada correctamente."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

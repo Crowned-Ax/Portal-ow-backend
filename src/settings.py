@@ -88,7 +88,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -210,3 +209,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Envio de correo electronico
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia 'us-east-1' por tu región SES
+EMAIL_PORT = 587  # Usar TLS
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'AKIAVPEYWQFGIGSTYPZM'  # Acceso SMTP (AWS Access Key)
+EMAIL_HOST_PASSWORD = 'BMke7QjB89LzVDjIdRvteg/VbASoq7jpRJZenQK+ulkN'  # Acceso SMTP (AWS Secret Key)
+DEFAULT_FROM_EMAIL = 'noreply@okweb.one'  # Dirección de envío
