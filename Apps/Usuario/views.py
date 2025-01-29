@@ -151,7 +151,7 @@ class PasswordResetRequestView(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
 
             # Construir el enlace de restablecimiento
-            frontend_url = "http://localhost:4200"
+            frontend_url = "https://okweb.one"
             reset_url = f"{frontend_url}/reset-password/{uid}/{token}/"
             from_email = settings.DEFAULT_FROM_EMAIL
 
