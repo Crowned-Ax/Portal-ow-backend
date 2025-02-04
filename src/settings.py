@@ -214,6 +214,3 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia 'us-east-1' por tu región SES
 EMAIL_PORT = 587  # Usar TLS
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'AKIAVPEYWQFGIGSTYPZM'  # Acceso SMTP (AWS Access Key)
-EMAIL_HOST_PASSWORD = 'BMke7QjB89LzVDjIdRvteg/VbASoq7jpRJZenQK+ulkN'  # Acceso SMTP (AWS Secret Key)
-DEFAULT_FROM_EMAIL = 'noreply@okweb.one'  # Dirección de envío
