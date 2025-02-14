@@ -11,6 +11,7 @@ class PaymentHistory(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
     clientService = models.ForeignKey(ClientService,on_delete=models.SET_NULL, null=True, blank=True)
     collaborator = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    currency = models.CharField(max_length=7)
     price = models.IntegerField(default=0)
     is_payed = models.BooleanField(default=False)
     

@@ -35,4 +35,4 @@ class ClientServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClientService
-        fields = ['id','client', 'service', 'price', 'startDate', 'expirationDate', 'name', 'is_recurrent', 'recurrence' ,'is_payed']
+        fields = ['id','client', 'service', 'currency','price', 'startDate', 'expirationDate', 'name', 'is_recurrent', 'recurrence' ,'is_payed']

@@ -105,6 +105,7 @@ class ClientService(models.Model):
     service = models.ForeignKey(Services, on_delete=models.CASCADE)
     startDate = models.DateField(default=timezone.now) 
     expirationDate = models.DateField(default=default_expiration_date)
+    currency = models.CharField(max_length=7)
     price = models.IntegerField(default=0)
     is_recurrent = models.BooleanField(default=False)
     recurrence = models.CharField(
