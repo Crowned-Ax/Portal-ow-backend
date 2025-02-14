@@ -63,6 +63,7 @@ class Client(models.Model):
     phone = models.CharField(max_length=15, blank=True)
     position = models.CharField(max_length=30, blank=True)
     photo = models.ImageField(upload_to="Profile/Clients",blank=True,null=True)
+    birthday = models.DateField(null=True, blank=True)
     # Informacion tributaria
     mark_name = models.CharField(max_length=100, blank=True)
     corporate_name = models.CharField(max_length=100, blank=True) 
