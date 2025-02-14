@@ -161,6 +161,7 @@ class ClientServiceViewSet(viewsets.ViewSet):
                         payment_history = PaymentHistory.objects.get(clientService=updated_client_service)
                         payment_history.is_payed = is_payed_nuevo
                         payment_history.date = now().date()
+                        payment_history.currency = data.get("currency")
                         payment_history.save()
                     except PaymentHistory.DoesNotExist:
                         return Response({'error': 'Historial de pagos no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
