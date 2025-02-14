@@ -11,7 +11,7 @@ class SimpleClientSerializer(serializers.ModelSerializer):
         return f"{obj.name} {obj.lastname}"
 
 class ClientSerializer(serializers.ModelSerializer):
-    
+    birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
     class Meta:
         model = Client
         fields = "__all__"
