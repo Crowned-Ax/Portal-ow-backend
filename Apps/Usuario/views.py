@@ -79,25 +79,6 @@ class CreateUserView(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class RegisterView(generics.CreateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            # Generar tokens JWT
-            refresh = RefreshToken.for_user(user)
-            access = str(refresh.access_token)
-
-            user_data = SimpleUserSerializer(user).data
-            return Response({
-                'refresh': str(refresh),
-                'access': access,
-                'user': user_data
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
