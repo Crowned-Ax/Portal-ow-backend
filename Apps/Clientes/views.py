@@ -73,6 +73,7 @@ class ClientServiceViewSet(viewsets.ViewSet):
                     service=client_service.service,
                     client=client_service.client,
                     clientService=client_service,
+                    currency= client_service.currency,
                     price=client_service.price,
                     is_payed=client_service.is_payed,
                 )
