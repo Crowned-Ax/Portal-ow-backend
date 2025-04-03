@@ -70,9 +70,7 @@ class MessageView(APIView):
 
 class Contacts(APIView):
     def get(self, request, *args, **kwargs):
-        print("entre")
         current_user = request.user
-        print(current_user)
         # Obtener todos los usuarios excepto el que hace la petición
         users = User.objects.exclude(email=current_user.email)
 
