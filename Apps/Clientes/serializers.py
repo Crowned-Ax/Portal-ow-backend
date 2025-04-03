@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Client, ClientService
+from .models import Client, ClientService, TributaryAdd
 
 class SimpleClientSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
@@ -36,3 +36,8 @@ class ClientServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClientService
         fields = ['id','client', 'service', 'currency','price', 'startDate', 'expirationDate', 'name', 'is_recurrent', 'recurrence' ,'is_payed']
+
+class TributarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TributaryAdd
+        fields = '__all__'

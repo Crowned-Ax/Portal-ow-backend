@@ -1,13 +1,18 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Client, ClientService
+from .models import Client, ClientService, TributaryAdd
 from ..HistorialPagos.models import PaymentHistory
-from .serializers import ClientSerializer, ClientServiceSerializer, SimpleClientSerializer
+from .serializers import ClientSerializer, ClientServiceSerializer, SimpleClientSerializer, TributarySerializer
 from rest_framework.generics import ListAPIView
 from django.utils.timezone import now
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from rest_framework.decorators import action
+from ..permissions import IsClient
+from rest_framework.exceptions import PermissionDenied
+from ..Usuario.models import User
+from django.shortcuts import get_object_or_404
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
@@ -16,15 +21,55 @@ class SimpleClientView(ListAPIView):
 
 # Listar y crear clientes
 class ClientListCreateView(generics.ListCreateAPIView):
-    queryset = Client.objects.all().order_by('-updated_at')
     serializer_class = ClientSerializer
+
+    def get_queryset(self):
+        # Si el usuario es un cliente, solo puede ver su propio perfil
+        if self.request.user.groups.filter(name="Cliente").exists():
+            return Client.objects.filter(email=self.request.user.email)
+        # Si no es un cliente, devuelve todos los clientes
+        return Client.objects.all().order_by('-updated_at')
+    def perform_create(self, serializer):
+        # Si el usuario es un cliente, entonces denegado
+        if self.request.user.groups.filter(name="Cliente").exists():
+            raise PermissionDenied("No tienes permisos para crear un cliente")
+        else:
+            tributarias = self.request.data.get("tributarys", [])
+            client = serializer.save()
+
+            # Si hay info tributaria adicional en la lista, crearlos
+            for tributary in tributarias:
+                TributaryAdd.objects.create(client=client, **tributary)
 
 # Obtener, actualizar y eliminar un cliente específico
 class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Client.objects.all()
     serializer_class = ClientSerializer
+    def get_queryset(self):
+        # Si el usuario es un cliente, solo puede ver su propio perfil
+        if self.request.user.groups.filter(name="Cliente").exists():
+            return Client.objects.filter(email=self.request.user.email)
+        # Si no es un cliente, devuelve todos los clientes
+        return Client.objects.all()
+    
+    def perform_update(self, serializer):
+        # Si el usuario es un cliente, solo puede actualizar su propio perfil
+        if self.request.user.groups.filter(name="Cliente").exists():
+            if serializer.instance.email != self.request.user.email:
+                raise PermissionDenied("No puedes actualizar otro cliente")
+            serializer.save()
+        else:
+            serializer.save()
 
+    def perform_destroy(self, instance):
+        # Si el usuario es un cliente, no puede hacer nada
+        if self.request.user.groups.filter(name="Cliente").exists():
+            raise PermissionDenied("No tienes permisos para eliminar")
+        else:
+            instance.delete()
+# Crud servicios de un cliente
 class ClientServiceViewSet(viewsets.ViewSet):
+
+    @action(detail=False, permission_classes=[IsClient])
     def create(self, request, client_id=None):
         data = request.data
         data["client"] = client_id
@@ -87,7 +132,8 @@ class ClientServiceViewSet(viewsets.ViewSet):
         # Serializamos todos los servicios creados para la respuesta
         serialized_services = ClientServiceSerializer(created_services, many=True)
         return Response(serialized_services.data, status=status.HTTP_201_CREATED)
-
+    
+    @action(detail=False, permission_classes=[IsClient])
     def destroy(self, request, client_id=None, pk=None):
         try:
             history = PaymentHistory.objects.filter(clientService=pk).first()
@@ -122,7 +168,8 @@ class ClientServiceViewSet(viewsets.ViewSet):
             'wordpress': serializer_not_ok_web.data,
             'servicios': serializer_ok_web.data
         })
-        
+
+    @action(detail=False, permission_classes=[IsClient])  
     def update(self, request, client_id=None, pk=None):
         data = request.data
         try:
@@ -172,4 +219,25 @@ class ClientServiceViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except ClientService.DoesNotExist:
-            return Response({'error': 'Servicio de cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Servicio de cliente no encontrado.'}, status=status.HTTP_404_NOT_FOUND)       
+# tributarias adicionales
+class TributaryViewSet(viewsets.ViewSet):
+    def list(self, request, client_id=None):
+        tributaries = TributaryAdd.objects.filter(client_id=client_id)
+        serializer = TributarySerializer(tributaries, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, permission_classes=[IsClient])
+    def destroy(self, request, pk=None):
+        tributary = get_object_or_404(TributaryAdd, pk=pk)
+        tributary.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, permission_classes=[IsClient])  
+    def update(self, request, client_id=None, pk=None):
+        tributary = get_object_or_404(TributaryAdd, pk=pk)
+        serializer = TributarySerializer(tributary, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

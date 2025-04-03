@@ -2,7 +2,8 @@ from django.db import models
 from ..Servicios.models import Services
 from django.utils import timezone
 from datetime import timedelta
-
+from ..Usuario.models import User
+from django.core.exceptions import ValidationError
 IDENTIFICACION_OPCIONES = [
     ('CC', 'Cédula de ciudadanía'),
     ('NIT', 'NIT'),
@@ -37,7 +38,6 @@ TAX_ID_OPCIONES = [
     ('06','No aplica'),
     ('07','Otros')
 ]
-
 RECURRENCE_OPCIONES = [
     ('Mensual', 'Mensual'),
     ('Anual', 'Anual')
@@ -55,7 +55,7 @@ class Client(models.Model):
     )
     # Informacion basica
     documentNumber = models.CharField(max_length=15, blank=False)
-    email = models.EmailField(blank=True)
+    email = models.EmailField()
     country = models.CharField(max_length=30, blank=True)
     department = models.CharField(max_length=30, blank=True)
     city = models.CharField(max_length=30, blank=True)
@@ -64,6 +64,8 @@ class Client(models.Model):
     position = models.CharField(max_length=30, blank=True)
     photo = models.ImageField(upload_to="Profile/Clients",blank=True,null=True)
     birthday = models.DateField(null=True, blank=True)
+    # Credenciales
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # Informacion tributaria
     mark_name = models.CharField(max_length=100, blank=True)
     corporate_name = models.CharField(max_length=100, blank=True) 
@@ -97,8 +99,23 @@ class Client(models.Model):
     # interno
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.user:
+            self.user = create_default_user(self)  # Asigna el usuario antes de guardar
+        super().save(*args, **kwargs)
+
 def default_expiration_date():
     return timezone.now() + timedelta(days=30)
+
+def create_default_user(client):
+    if not client.email or not client.documentNumber:
+        raise ValidationError("El cliente debe tener un email y un documentNumber para crear el usuario.")
+
+    # Verificar si ya existe un usuario con el mismo email
+    if User.objects.filter(email=client.email).exists():
+        raise ValidationError("El email ya está en uso.")
+    # Crear y devolver el usuario
+    return User.objects.create_user(email=client.email, password=client.documentNumber)
 
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -117,3 +134,35 @@ class ClientService(models.Model):
     is_payed = models.BooleanField(default=False)
     #interno
     updated_at = models.DateTimeField(auto_now=True) 
+
+class TributaryAdd(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    mark_name = models.CharField(max_length=100, blank=True)
+    corporate_name = models.CharField(max_length=100, blank=True) 
+    company_name = models.CharField(max_length=100, blank=True)
+    tributary_id = models.CharField(max_length=30, blank=True)
+    tributary_number = models.CharField(max_length=30, blank=True)
+    taxpayer_type = models.CharField(
+        choices=CONTRIBUYENTE_OPCIONES, 
+        default='Natural',
+        max_length=10,
+        verbose_name='Tipo de contribuyente'
+    )
+    tax_liability = models.CharField(
+        choices=TAX_OPCIONES, 
+        default='IVA',
+        max_length=8,
+        verbose_name='Responsabilidad tributaria'
+    )
+    tax_id_type = models.CharField(
+        choices=TAX_ID_OPCIONES, 
+        default='01',
+        max_length=55,
+        verbose_name='Tipo de identificacion tributaria 2'
+    )
+    regime_type = models.CharField(
+        choices=REGIMEN_OPCIONES, 
+        default='IVA',
+        max_length=7,
+        verbose_name='Tipo de regimen'
+    )
