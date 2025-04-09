@@ -7,7 +7,7 @@ from .serializers import ClientSerializer, ClientServiceSerializer, SimpleClient
 from rest_framework.generics import ListAPIView
 from django.utils.timezone import now
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from datetime import datetime, timedelta
 from rest_framework.decorators import action
 from ..permissions import IsClient
 from rest_framework.exceptions import PermissionDenied
@@ -99,7 +99,7 @@ class ClientServiceViewSet(viewsets.ViewSet):
 
         # Obtenemos las fechas iniciales del primer servicio
         current_start_date = serializer.validated_data["startDate"]
-        current_expiration_date = serializer.validated_data["startDate"] + delta
+        current_expiration_date = serializer.validated_data["startDate"] + delta - timedelta(days=1)
 
         for i in range(cantidad):
             # Actualizamos las fechas dinámicamente
