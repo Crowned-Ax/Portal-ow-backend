@@ -68,6 +68,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return self.name +" "+ self.lastname
     
-class SocialNetwork(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    url = models.CharField(max_length=40, blank=True)

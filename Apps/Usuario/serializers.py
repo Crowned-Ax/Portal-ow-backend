@@ -1,27 +1,16 @@
-from .models import User, SocialNetwork, CustomPermission, Role
+from .models import User, CustomPermission, Role
 from ..Clientes.models import Client
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import check_password
 
-class SocialNetworkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SocialNetwork
-        fields = ['url']
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
-    social_networks = SocialNetworkSerializer(many=True, read_only=True)
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
 
     class Meta:
         model = User
         fields = '__all__'
-
-    def create(self, validated_data):
-        #Falta incluir logica de redes sociales
-        user = User.objects.create_user(**validated_data)
-        return user
 
 class SimpleUserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()

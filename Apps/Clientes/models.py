@@ -67,7 +67,6 @@ class Client(models.Model):
     # Credenciales
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     # Informacion tributaria
-    mark_name = models.CharField(max_length=100, blank=True)
     corporate_name = models.CharField(max_length=100, blank=True) 
     company_name = models.CharField(max_length=100, blank=True)
     tributary_id = models.CharField(max_length=30, blank=True)
@@ -115,7 +114,7 @@ def create_default_user(client):
     if User.objects.filter(email=client.email).exists():
         raise ValidationError("El email ya está en uso.")
     # Crear y devolver el usuario
-    return User.objects.create_user(email=client.email, password=client.documentNumber)
+    return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=1)
 
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
