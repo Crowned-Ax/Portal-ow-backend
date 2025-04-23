@@ -15,9 +15,10 @@ urlpatterns = [
     # Informacion tributaria adicional
     path('<int:client_id>/tributary/', 
          TributaryViewSet.as_view({'get': 'list'}), name='tributarys-list'),
+    path('<int:client_id>/tributary/update-all/', 
+         TributaryViewSet.as_view({'put': 'update_all'}), name='tributary-update-all'),
     path('<int:client_id>/tributary/<int:pk>/', 
-         TributaryViewSet.as_view({'delete': 'destroy', 'put': 'update'}), 
-         name='tributary-detail-update'),
+         TributaryViewSet.as_view({'delete': 'destroy'}), name='tributary-delete'),
     #Principal
     path('', ClientListCreateView.as_view(), name='client-list-create'),
     path('simple/', SimpleClientView.as_view(), name='simple-client-list')#clientes simplificados

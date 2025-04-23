@@ -11,6 +11,8 @@ from datetime import datetime, timedelta
 #from ..Usuario.permissions import  HasActionPermission
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+import json
+from rest_framework.decorators import action
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
@@ -28,10 +30,13 @@ class ClientListCreateView(generics.ListCreateAPIView):
         # Si no es un cliente, devuelve todos los clientes
         return Client.objects.all().order_by('-updated_at')
     def perform_create(self, serializer):
-        tributarias = self.request.data.get("tributarys", [])
+        tributarias_raw = self.request.data.get("tributarys", "[]")
+        try:
+            tributarias = json.loads(tributarias_raw)
+        except json.JSONDecodeError:
+            tributarias = []
         client = serializer.save()
-
-        # Si hay info tributaria adicional en la lista, crearlos
+        # Si hay más tributarias, guardarlas como registros adicionales
         for tributary in tributarias:
             TributaryAdd.objects.create(client=client, **tributary)
 
@@ -226,10 +231,31 @@ class TributaryViewSet(viewsets.ViewSet):
         tributary.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def update(self, request, client_id=None, pk=None):
-        tributary = get_object_or_404(TributaryAdd, pk=pk)
-        serializer = TributarySerializer(tributary, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['put'], url_path='update-all')
+    def update_all(self, request, client_id=None):
+        try:
+            data = json.loads(request.data.get("tributarys", "[]"))
+        except json.JSONDecodeError:
+            return Response({"error": "Invalid JSON in tributarys"}, status=status.HTTP_400_BAD_REQUEST)
+
+        updated_items = []
+        for item in data:
+            tributary_id = item.get("id")
+            item["client"] = client_id  # Asegura que se relacione con el cliente
+
+            if tributary_id:
+                try:
+                    tributary = TributaryAdd.objects.get(id=tributary_id, client_id=client_id)
+                    serializer = TributarySerializer(tributary, data=item, partial=True)
+                except TributaryAdd.DoesNotExist:
+                    serializer = TributarySerializer(data=item)  # Si no existe, créalo
+            else:
+                serializer = TributarySerializer(data=item)  # Nuevo si no tiene ID
+
+            if serializer.is_valid():
+                serializer.save()
+                updated_items.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(updated_items, status=status.HTTP_200_OK)
