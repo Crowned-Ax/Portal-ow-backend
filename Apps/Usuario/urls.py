@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     LoginView,
     UserDetailView,
@@ -8,10 +8,18 @@ from .views import (
     CreateUserView,
     SimpleUserListView,
     PasswordResetRequestView,
-    PasswordResetView
+    PasswordResetView,
+    RoleViewSet,
+    CustomPermissionViewSet,
+    UserRoleViewSet
 )
-
+from rest_framework.routers import DefaultRouter
 app_name = 'usuario'
+
+router = DefaultRouter()
+router.register(r'roles', RoleViewSet)
+router.register(r'permissions', CustomPermissionViewSet)
+router.register(r'user-rol', UserRoleViewSet)
 
 urlpatterns = [
     path("change-password/", ChangePasswordView.as_view(), name='change-password'),# Cambiar la contraseña del usuario logueado
@@ -22,5 +30,8 @@ urlpatterns = [
     path("password-reset-request/", PasswordResetRequestView.as_view(), name='password-reset-request'),
     path("reset-password/", PasswordResetView.as_view(), name='password-reset'),
     path("<str:email>/", UserDetailView.as_view(), name ="user-detail"), #traer/modificar un usuario segun su correo electronico
+    #administracion
+    path("admin/", include(router.urls)),
+    #base
     path("", UserListView.as_view(), name='user-list') # Traer todos los usuarios
 ]

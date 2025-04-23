@@ -9,7 +9,7 @@ class Command(BaseCommand):
         clients_without_users = Client.objects.filter(user__isnull=True)
 
         for client in clients_without_users:
-            user = User.objects.create(
+            user = User.objects.create_user(
                 email=client.email,
                 password=client.documentNumber
             )

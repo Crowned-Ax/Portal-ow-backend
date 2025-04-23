@@ -12,8 +12,8 @@ urlpatterns = [
     path('<int:client_id>/clientservices/<int:pk>/', 
          ClientServiceViewSet.as_view({'delete': 'destroy', 'put': 'update'}), 
          name='clientservice-detail-update'),
-     # Informacion tributaria adicional
-     path('<int:client_id>/tributary/', 
+    # Informacion tributaria adicional
+    path('<int:client_id>/tributary/', 
          TributaryViewSet.as_view({'get': 'list'}), name='tributarys-list'),
     path('<int:client_id>/tributary/<int:pk>/', 
          TributaryViewSet.as_view({'delete': 'destroy', 'put': 'update'}), 

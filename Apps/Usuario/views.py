@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import check_password
@@ -10,8 +10,15 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import User
-from .serializers import UserSerializer, LoginSerializer, SimpleUserSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
+from .models import User, Role, CustomPermission
+from .serializers import (UserSerializer,
+                          LoginSerializer,
+                          SimpleUserSerializer,
+                          PasswordResetRequestSerializer,
+                          PasswordResetSerializer,
+                          RoleSerializer,
+                          CustomPermissionSerializer,
+                          UserRoleSerializer)
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
@@ -170,3 +177,17 @@ class PasswordResetView(APIView):
             user.save()
             return Response({"message": "Contraseña actualizada correctamente."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class RoleViewSet(viewsets.ModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+class CustomPermissionViewSet(viewsets.ModelViewSet):
+    queryset = CustomPermission.objects.all()
+    serializer_class = CustomPermissionSerializer
+
+class UserRoleViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserRoleSerializer
+    lookup_field = 'email'
+    lookup_value_regex = '[^/]+'

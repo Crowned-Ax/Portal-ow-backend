@@ -9,6 +9,20 @@ IDENTIFICACION_OPCIONES = [
     ('P', 'Pasaporte'),
 ]
 
+class CustomPermission(models.Model):
+    code = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Role(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    permissions = models.ManyToManyField(CustomPermission, blank=True)
+    is_staff = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
 class User(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(primary_key=True)
@@ -48,6 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     #interno
     updated_at = models.DateTimeField(auto_now=True) 
     USERNAME_FIELD = 'email'
+    rol = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     objects = UserManager()
 
     def get_full_name(self):
