@@ -135,7 +135,6 @@ class ClientService(models.Model):
 
 class TributaryAdd(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    mark_name = models.CharField(max_length=100, blank=True)
     corporate_name = models.CharField(max_length=100, blank=True) 
     company_name = models.CharField(max_length=100, blank=True)
     tributary_id = models.CharField(max_length=30, blank=True)
