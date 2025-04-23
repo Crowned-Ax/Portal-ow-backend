@@ -26,7 +26,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
         if instance.rol and instance.rol.is_staff:
             client = Client.objects.filter(email=instance.email).first()
-            data['company_name'] = client.company_name if client else 'OkWeb'
+            data['corporate_name'] = client.corporate_name if client else 'OkWeb'
 
         return data
     
