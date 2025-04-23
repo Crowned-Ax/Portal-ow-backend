@@ -46,7 +46,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     city = models.CharField(max_length=40, blank=True)
     address = models.CharField(max_length=50, blank=True)
     # campos de Cv
-    position = models.CharField(max_length=40, blank=True)
     description = models.TextField(blank=True,null=True)
     language = models.CharField(max_length=40, blank=True)
     formation = models.CharField(max_length=50, blank=True)

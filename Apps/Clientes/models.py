@@ -61,7 +61,6 @@ class Client(models.Model):
     city = models.CharField(max_length=30, blank=True)
     address = models.CharField(max_length=80, blank=True)
     phone = models.CharField(max_length=15, blank=True)
-    position = models.CharField(max_length=30, blank=True)
     photo = models.ImageField(upload_to="Profile/Clients",blank=True,null=True)
     birthday = models.DateField(null=True, blank=True)
     # Credenciales
