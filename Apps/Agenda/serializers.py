@@ -6,5 +6,5 @@ class ScheduleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Schedule
-        fields = ['id', 'time', 'date', 'priority', 'title', 'subtext', 'completed', 'user']
-        read_only_fields = ['user']
+        fields = ['id', 'time', 'date', 'priority', 'title', 'subtext', 'completed', 'created_by', 'assigned_to']
+        read_only_fields = ['created_by']

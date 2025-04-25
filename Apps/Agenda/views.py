@@ -4,33 +4,41 @@ from .models import Schedule
 from ..Usuario.models import User
 from .serializers import ScheduleSerializer
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     serializer_class = ScheduleSerializer
 
     def get_queryset(self):
-        return Schedule.objects.filter(user=self.request.user)
+        return Schedule.objects.filter(
+            Q(created_by=self.request.user) | Q(assigned_to=self.request.user)
+        )
 
     def perform_create(self, serializer):
-        user = serializer.initial_data.get('user')
-        if not user or user == "":
-            user = self.request.user
+        assigned_email = serializer.initial_data.get('assigned_to')
+        if assigned_email:
+            assigned_user = User.objects.filter(email=assigned_email).first()
+            if not assigned_user:
+                raise ValidationError("El usuario asignado no es válido.")
         else:
-            user = User.objects.filter(email=user).first()
-            if not user:
-                raise ValidationError("El usuario proporcionado no es válido.")
+            assigned_user = self.request.user
 
-        serializer.save(user=user)
+        serializer.save(
+            created_by=self.request.user,
+            assigned_to=assigned_user
+        )
     
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.user != request.user:
+        # Solo el creador puede eliminar
+        if instance.created_by != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.user != request.user:
+        # Solo el creador puede actualizar
+        if instance.created_by != request.user and instance.assigned_to != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
         return super().update(request, *args, **kwargs)
 

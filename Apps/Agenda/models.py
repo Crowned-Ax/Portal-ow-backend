@@ -8,7 +8,8 @@ class Schedule(models.Model):
     title = models.CharField(max_length=100)
     subtext = models.TextField(blank=True,null=True)
     completed = models.BooleanField(default=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_schedules')
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_schedules')
 
     class Meta:
         ordering = ['date', 'time']
