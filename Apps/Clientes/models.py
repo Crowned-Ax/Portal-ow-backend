@@ -94,6 +94,8 @@ class Client(models.Model):
         max_length=7,
         verbose_name='Tipo de regimen'
     )
+    rut = models.FileField(upload_to="Documents/RUT", blank=True, null=True)
+    c_commerce = models.FileField(upload_to="Documents/C_Commercial", blank=True, null=True)
     # interno
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -163,3 +165,5 @@ class TributaryAdd(models.Model):
         max_length=7,
         verbose_name='Tipo de regimen'
     )
+    rut = models.FileField(upload_to="Documents/RUT", blank=True, null=True)
+    c_commerce = models.FileField(upload_to="Documents/C_Commercial", blank=True, null=True)
