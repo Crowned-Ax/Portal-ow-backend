@@ -25,7 +25,7 @@ class Notification(models.Model):
         super().save(*args, **kwargs)
 
         if self.type == 'info' and self.user:
-            from_email = settings.DEFAULT_FROM_EMAIL
+            from_email = settings.NOTIF_FROM_EMAIL
             subject = "Nueva notificación importante"
             message = self.message
             recipient_list = [self.user.email]

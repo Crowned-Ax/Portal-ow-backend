@@ -213,6 +213,6 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Envio de correo electronico
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia 'us-east-1' por tu región SES
-EMAIL_PORT = 587  # Usar TLS
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
