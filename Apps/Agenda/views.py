@@ -5,6 +5,8 @@ from ..Usuario.models import User
 from .serializers import ScheduleSerializer
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from ..Notificaciones.models import Notification
+from django.utils import timezone
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     serializer_class = ScheduleSerializer
@@ -20,6 +22,12 @@ class ScheduleViewSet(viewsets.ModelViewSet):
             assigned_user = User.objects.filter(email=assigned_email).first()
             if not assigned_user:
                 raise ValidationError("El usuario asignado no es válido.")
+            Notification.objects.create(
+                message=f"{self.request.user} te asigno una tarea",
+                date=timezone.now().date(),
+                type="info",
+                user=assigned_user
+            )
         else:
             assigned_user = self.request.user
 

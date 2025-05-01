@@ -11,6 +11,8 @@ from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import User, Role, CustomPermission
+from ..Notificaciones.models import Notification
+from django.utils import timezone
 from .serializers import (UserSerializer,
                           LoginSerializer,
                           SimpleUserSerializer,
@@ -121,6 +123,12 @@ class ChangePasswordView(APIView):
         # Cambiar la contraseña del usuario
         user.set_password(new_password)
         user.save()
+        Notification.objects.create(
+                message=f"Haz cambiado tu contraseña",
+                date=timezone.now().date(),
+                type="info",
+                user=user
+            )
         return Response({"detail": "La contraseña ha sido cambiada exitosamente."}, status=status.HTTP_200_OK)
 
 class PasswordResetRequestView(APIView):
