@@ -9,7 +9,7 @@ class Schedule(models.Model):
     subtext = models.TextField(blank=True,null=True)
     completed = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_schedules')
-    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_schedules')
+    assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_schedules', null=True)
 
     class Meta:
         ordering = ['date', 'time']

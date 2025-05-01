@@ -18,7 +18,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         assigned_email = serializer.initial_data.get('assigned_to')
-        if assigned_email:
+        if assigned_email and assigned_email != "":
             assigned_user = User.objects.filter(email=assigned_email).first()
             if not assigned_user:
                 raise ValidationError("El usuario asignado no es válido.")
