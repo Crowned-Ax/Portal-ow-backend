@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('Apps.Agenda.urls')), #agenda
     path('', include('Apps.Servicios.urls')), #services
     path('', include('Apps.HistorialPagos.urls')), # Historial de pagos
+    path('notifications/', include('Apps.Notificaciones.urls')),
 ]

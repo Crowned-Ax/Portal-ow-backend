@@ -59,7 +59,8 @@ LOCAL_APPS = [
     'Apps.Chat',
     'Apps.Clientes',
     'Apps.Servicios',
-    'Apps.HistorialPagos'
+    'Apps.HistorialPagos',
+    'Apps.Notificaciones'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PART_APP
