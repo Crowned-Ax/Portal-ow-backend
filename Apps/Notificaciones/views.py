@@ -1,19 +1,24 @@
-from rest_framework import generics, permissions
+from rest_framework import generics
 from .models import Notification
 from .serializers import NotificationSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+
+class TenPerPagePagination(PageNumberPagination):
+    page_size = 10
 
 class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
+    pagination_class = TenPerPagePagination
     def get_queryset(self):
         user = self.request.user
         return Notification.objects.filter(
             type='event'
-        ).order_by('-updated_at')[:10] | Notification.objects.filter(
+        ).order_by('-updated_at') | Notification.objects.filter(
             type='info',
             user=user
-        ).order_by('-updated_at')[:10]
+        ).order_by('-updated_at')
 
 
 class NotificationDeleteView(generics.DestroyAPIView):
