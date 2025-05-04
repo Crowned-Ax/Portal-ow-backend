@@ -10,10 +10,10 @@ class NotificationListView(generics.ListAPIView):
         user = self.request.user
         return Notification.objects.filter(
             type='event'
-        ) | Notification.objects.filter(
+        ).order_by('-updated_at')[:10] | Notification.objects.filter(
             type='info',
             user=user
-        )
+        ).order_by('-updated_at')[:10]
 
 
 class NotificationDeleteView(generics.DestroyAPIView):

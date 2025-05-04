@@ -1,44 +1,63 @@
 from django.core.management.base import BaseCommand
 from datetime import date, timedelta
 from django.utils.timezone import now
-from Usuario.models import User
-from Notificaciones.models import Notification
+from ...Usuario.models import User
+from ...Notificaciones.models import Notification
 
 class Command(BaseCommand):
     help = 'Revisa cumpleaños próximos y crea/actualiza notificación tipo evento'
 
     def handle(self, *args, **kwargs):
         today = date.today()
-        upcoming = today + timedelta(days=7)
+        upcoming_limit = today + timedelta(days=7)
 
-        users_with_upcoming_birthdays = []
+        cumpleaños_hoy = []
+        cumpleaños_proximos = []
 
         for user in User.objects.all():
             if user.birthday:
                 birthday_this_year = user.birthday.replace(year=today.year)
-                if today <= birthday_this_year <= upcoming:
+                if birthday_this_year == today:
+                    cumpleaños_hoy.append(f"🎉 Hoy cumple {user.get_full_name()}")
+                elif today < birthday_this_year <= upcoming_limit:
                     days_left = (birthday_this_year - today).days
-                    if days_left == 0:
-                        users_with_upcoming_birthdays.append(f"🎉 Hoy cumple {user.get_full_name()}")
-                    else:
-                        users_with_upcoming_birthdays.append(f"🎂 {user.get_full_name()} cumple en {days_left} días")
+                    cumpleaños_proximos.append(f"🎂 {user.get_full_name()} cumple en {days_left} días")
 
-        if users_with_upcoming_birthdays:
-            full_message = "Cumpleaños próximos:\n" + "\n".join(users_with_upcoming_birthdays)
-
-            noti, created = Notification.objects.get_or_create(
+        # Notificación: Cumpleaños Hoy
+        if cumpleaños_hoy:
+            message_hoy = "Cumpleaños de hoy:\n" + "\n".join(cumpleaños_hoy)
+            noti_hoy, created = Notification.objects.get_or_create(
                 type='event',
                 user=None,
-                message__startswith="Cumpleaños próximos:"
+                message__startswith="Cumpleaños de hoy:",
+                defaults={
+                    'message': message_hoy,
+                    'date': today
+                }
             )
+            if not created:
+                noti_hoy.message = message_hoy
+                noti_hoy.date = today
+                noti_hoy.save()
+            self.stdout.write(self.style.SUCCESS("Notificación de cumpleaños de hoy actualizada o creada."))
 
-            noti.message = full_message
-            noti.date = today
-            noti.save()
+        # Notificación: Cumpleaños Próximos
+        if cumpleaños_proximos:
+            message_proximos = "Cumpleaños próximos:\n" + "<br>".join(cumpleaños_proximos)
+            noti_prox, created = Notification.objects.get_or_create(
+                type='event',
+                user=None,
+                message__startswith="Cumpleaños próximos:",
+                defaults={
+                    'message': message_proximos,
+                    'date': today
+                }
+            )
+            if not created:
+                noti_prox.message = message_proximos
+                noti_prox.date = today
+                noti_prox.save()
+            self.stdout.write(self.style.SUCCESS("Notificación de cumpleaños próximos actualizada o creada."))
 
-            if created:
-                self.stdout.write(self.style.SUCCESS('Notificación de cumpleaños creada.'))
-            else:
-                self.stdout.write(self.style.SUCCESS('Notificación de cumpleaños actualizada.'))
-        else:
-            self.stdout.write(self.style.WARNING('No hay cumpleaños próximos.'))
+        if not cumpleaños_hoy and not cumpleaños_proximos:
+            self.stdout.write(self.style.WARNING("No hay cumpleaños hoy ni próximos."))
