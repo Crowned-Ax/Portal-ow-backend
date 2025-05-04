@@ -23,7 +23,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
             if not assigned_user:
                 raise ValidationError("El usuario asignado no es válido.")
             Notification.objects.create(
-                message=f"{self.request.user} te asigno una tarea",
+                message=f"{assigned_user.get_full_name()} te asigno una tarea",
                 date=timezone.now().date(),
                 type="info",
                 user=assigned_user
