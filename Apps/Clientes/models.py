@@ -65,37 +65,6 @@ class Client(models.Model):
     birthday = models.DateField(null=True, blank=True)
     # Credenciales
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    # Informacion tributaria
-    corporate_name = models.CharField(max_length=100, blank=True) 
-    company_name = models.CharField(max_length=100, blank=True)
-    tributary_id = models.CharField(max_length=30, blank=True)
-    tributary_number = models.CharField(max_length=30, blank=True)
-    taxpayer_type = models.CharField(
-        choices=CONTRIBUYENTE_OPCIONES, 
-        default='Natural',
-        max_length=10,
-        verbose_name='Tipo de contribuyente'
-    )
-    tax_liability = models.CharField(
-        choices=TAX_OPCIONES, 
-        default='IVA',
-        max_length=8,
-        verbose_name='Responsabilidad tributaria'
-    )
-    tax_id_type = models.CharField(
-        choices=TAX_ID_OPCIONES, 
-        default='01',
-        max_length=55,
-        verbose_name='Tipo de identificacion tributaria 2'
-    )
-    regime_type = models.CharField(
-        choices=REGIMEN_OPCIONES, 
-        default='IVA',
-        max_length=7,
-        verbose_name='Tipo de regimen'
-    )
-    rut = models.FileField(upload_to="Documents/RUT", blank=True, null=True)
-    c_commerce = models.FileField(upload_to="Documents/C_Commercial", blank=True, null=True)
     # interno
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -167,3 +136,13 @@ class TributaryAdd(models.Model):
     )
     rut = models.FileField(upload_to="Documents/RUT", blank=True, null=True)
     c_commerce = models.FileField(upload_to="Documents/C_Commercial", blank=True, null=True)
+
+    def delete(self, *args, **kwargs):
+        # Elimina archivos si existen
+        if self.rut:
+            self.rut.delete(save=False)
+        if self.c_commerce:
+            self.c_commerce.delete(save=False)
+        
+        # Luego elimina el objeto del modelo
+        super().delete(*args, **kwargs)

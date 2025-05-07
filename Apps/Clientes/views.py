@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 #from ..Usuario.permissions import  HasActionPermission
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-import json
+from collections import defaultdict
 from rest_framework.decorators import action
 
 # Cliente simplificado
@@ -30,15 +30,7 @@ class ClientListCreateView(generics.ListCreateAPIView):
         # Si no es un cliente, devuelve todos los clientes
         return Client.objects.all().order_by('-updated_at')
     def perform_create(self, serializer):
-        tributarias_raw = self.request.data.get("tributarys", "[]")
-        try:
-            tributarias = json.loads(tributarias_raw)
-        except json.JSONDecodeError:
-            tributarias = []
         client = serializer.save()
-        # Si hay más tributarias, guardarlas como registros adicionales
-        for tributary in tributarias:
-            TributaryAdd.objects.create(client=client, **tributary)
 
 # Obtener, actualizar y eliminar un cliente específico
 class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -231,26 +223,37 @@ class TributaryViewSet(viewsets.ViewSet):
         tributary.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['put'], url_path='update-all')
-    def update_all(self, request, client_id=None):
-        try:
-            data = json.loads(request.data.get("tributarys", "[]"))
-        except json.JSONDecodeError:
-            return Response({"error": "Invalid JSON in tributarys"}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['post'], url_path='all')
+    def all(self, request, client_id=None):
+        # Paso 1: recolectar todos los tributarios (nombres como tributaries[0][campo])
+        tributaries_dict = defaultdict(dict)
+
+        # Combinar datos de texto y archivos
+        all_data = list(request.POST.items()) + list(request.FILES.items())
+
+        for key, value in all_data:
+            if key.startswith("tributaries["):
+                # Extrae el índice y campo: tributaries[0][corporate_name] -> 0, corporate_name
+                import re
+                match = re.match(r"tributaries\[(\d+)\]\[(\w+)\]", key)
+                if match:
+                    idx, field = match.groups()
+                    tributaries_dict[int(idx)][field] = value
 
         updated_items = []
-        for item in data:
-            tributary_id = item.get("id")
-            item["client"] = client_id  # Asegura que se relacione con el cliente
+
+        for tributary_data in tributaries_dict.values():
+            tributary_id = tributary_data.get("id")
+            tributary_data["client"] = client_id  # Relacionar con cliente
 
             if tributary_id:
                 try:
                     tributary = TributaryAdd.objects.get(id=tributary_id, client_id=client_id)
-                    serializer = TributarySerializer(tributary, data=item, partial=True)
+                    serializer = TributarySerializer(tributary, data=tributary_data, partial=True)
                 except TributaryAdd.DoesNotExist:
-                    serializer = TributarySerializer(data=item)  # Si no existe, créalo
+                    serializer = TributarySerializer(data=tributary_data)  # Si no existe, créalo
             else:
-                serializer = TributarySerializer(data=item)  # Nuevo si no tiene ID
+                serializer = TributarySerializer(data=tributary_data)
 
             if serializer.is_valid():
                 serializer.save()
@@ -259,3 +262,24 @@ class TributaryViewSet(viewsets.ViewSet):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(updated_items, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='delete_file')
+    def delete_file(self, request):
+        tributary_id = request.data.get("id")
+        field = request.data.get("field")
+
+        if field not in ["rut", "c_commerce"]:
+            return Response({"error": "Campo no válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            tributary = TributaryAdd.objects.get(id=tributary_id)
+        except TributaryAdd.DoesNotExist:
+            return Response({"error": "Tributario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+        file_field = getattr(tributary, field, None)
+
+        if file_field and file_field.name:
+            file_field.delete(save=True)
+            return Response({"success": f"{field} eliminado correctamente"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Archivo no existe"}, status=status.HTTP_400_BAD_REQUEST)
