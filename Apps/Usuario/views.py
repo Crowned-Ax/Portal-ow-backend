@@ -26,10 +26,10 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     def get_queryset(self):
         # Excluir al usuario que hace la petición
-        return User.objects.exclude(email=self.request.user.email).order_by('-updated_at')
+        return User.objects.exclude(email=self.request.user.email).order_by('name')
 
 class SimpleUserListView(generics.ListAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('name')
     serializer_class = SimpleUserSerializer
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
