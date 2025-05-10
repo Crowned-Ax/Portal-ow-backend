@@ -21,6 +21,6 @@ urlpatterns = [
         TributaryViewSet.as_view({'delete': 'destroy'}), name='tributary-delete'),
     path("tributary/delete_file/", TributaryViewSet.as_view({'post': 'delete_file'}), name="delete_file"),
     #Principal
-    path('', ClientListCreateView.as_view(), name='client-list-create'),
-    path('simple/', SimpleClientView.as_view(), name='simple-client-list')#clientes simplificados
+    path('simple/', SimpleClientView.as_view(), name='simple-client-list'),#clientes simplificados
+    path('', ClientListCreateView.as_view(), name='client-list-create')
 ]

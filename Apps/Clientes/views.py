@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
-    queryset = Client.objects.all().order_by('-updated_at')
+    queryset = Client.objects.all().order_by('name')
     serializer_class = SimpleClientSerializer
 
 # Listar y crear clientes

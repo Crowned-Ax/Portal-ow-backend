@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SimpleUserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
+    rol = serializers.SlugRelatedField(read_only=True, slug_field='name')
     class Meta:
         model = User
         fields = ['email', 'fullname', 'rol', 'photo']

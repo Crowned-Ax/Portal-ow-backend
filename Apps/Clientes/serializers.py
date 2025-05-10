@@ -5,20 +5,10 @@ class SimpleClientSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
     class Meta:
         model = Client
-        fields = ['id','fullname']
-    
+        fields = ['id','fullname', 'email', 'photo']
+
     def get_fullname(self, obj):
         return f"{obj.name} {obj.lastname}"
-    
-    def validate_rut(self, value):
-        if value and not value.name.endswith('.pdf'):
-            raise serializers.ValidationError("El archivo RUT debe ser un PDF.")
-        return value
-
-    def validate_c_commerce(self, value):
-        if value and not value.name.endswith('.pdf'):
-            raise serializers.ValidationError("El archivo Cámara de Comercio debe ser un PDF.")
-        return value
 
 class ClientSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
