@@ -63,7 +63,7 @@ class PasswordResetSerializer(serializers.Serializer):
 class CustomPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomPermission
-        fields = ['id', 'code']
+        fields = ['id', 'code', 'model']
 
 class RoleSerializer(serializers.ModelSerializer):
     permissions = CustomPermissionSerializer(many=True, read_only=True)
