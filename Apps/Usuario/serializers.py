@@ -68,7 +68,7 @@ class CustomPermissionSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     permissions = CustomPermissionSerializer(many=True, read_only=True)
     permission_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=CustomPermission.objects.all(), write_only=True, source='permissions'
+        many=True, queryset=CustomPermission.objects.all(), write_only=True, source='permissions', required=False
     )
 
     class Meta:
