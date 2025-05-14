@@ -31,9 +31,10 @@ class Command(BaseCommand):
         #CustomPermission.objects.get_or_create(code="view_client_own")
         # Crea los roles si no existen
         role_names = ["Super Admin", "Admin", "Colaborador", "Cliente", "Cliente Aux"]
+        default_staff = [True, True, True, False, False]
         roles = {}
-        for name in role_names:
-            role, _ = Role.objects.get_or_create(name=name)
+        for name, is_staff in zip(role_names, default_staff):
+            role, _ = Role.objects.get_or_create(name=name, defaults={'is_staff': is_staff})
             roles[name] = role
 
         # Asignar permisos por rol

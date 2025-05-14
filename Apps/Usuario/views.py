@@ -191,6 +191,16 @@ class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        is_staff = self.request.query_params.get('is_staff')
+        if is_staff is not None:
+            is_staff = is_staff.lower() == 'true'
+            queryset = queryset.filter(is_staff=is_staff)
+            queryset = queryset.exclude(name="Super Admin")
+        return queryset
+
+
 class CustomPermissionViewSet(viewsets.ModelViewSet):
     queryset = CustomPermission.objects.all()
     serializer_class = CustomPermissionSerializer
