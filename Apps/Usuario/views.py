@@ -197,7 +197,6 @@ class RoleViewSet(viewsets.ModelViewSet):
         if is_staff is not None:
             is_staff = is_staff.lower() == 'true'
             queryset = queryset.filter(is_staff=is_staff)
-            queryset = queryset.exclude(name="Super Admin")
         return queryset
 
 
