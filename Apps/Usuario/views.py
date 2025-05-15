@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Q
 from .models import User, Role, CustomPermission
 from ..Notificaciones.models import Notification
 from django.utils import timezone
@@ -26,11 +27,13 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     def get_queryset(self):
         # Excluir al usuario que hace la petición
-        return User.objects.exclude(email=self.request.user.email).order_by('name')
+        return User.objects.exclude(Q(email=self.request.user.email) | Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
 
 class SimpleUserListView(generics.ListAPIView):
-    queryset = User.objects.all().order_by('name')
     serializer_class = SimpleUserSerializer
+    def get_queryset(self):
+        # Excluir al usuario que hace la petición
+        return User.objects.exclude(Q(email=self.request.user.email) | Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer

@@ -78,7 +78,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=180),
     'ROTATE_REFRESH_TOKENS': True,  # Genera un nuevo refresh token con cada renovación
     'BLACKLIST_AFTER_ROTATION': True,  # Invalida el refresh token anterior tras la rotación
     'USER_ID_FIELD': 'email',  # Cambia esto al nombre de tu campo identificador

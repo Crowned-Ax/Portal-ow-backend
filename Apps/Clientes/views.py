@@ -59,6 +59,7 @@ class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
         if role and (role.name).lower() == "cliente":
             raise PermissionDenied("No tienes permisos para eliminar")
         else:
+            instance.user.delete()
             instance.delete()
 # Crud servicios de un cliente
 class ClientServiceViewSet(viewsets.ViewSet):

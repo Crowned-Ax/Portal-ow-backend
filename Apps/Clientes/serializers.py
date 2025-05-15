@@ -25,9 +25,10 @@ class ClientSerializer(serializers.ModelSerializer):
         return data
     
     def create(self, validated_data):
+        r = Role.objects.filter(name="Cliente").first()
         role = validated_data.pop('rol', None)
         client = Client(**validated_data)
-        client._pending_role = role.id if role else None
+        client._pending_role = role.id if role else r
         client.save()
         return client
 
