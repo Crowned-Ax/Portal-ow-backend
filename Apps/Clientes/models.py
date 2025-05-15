@@ -65,6 +65,7 @@ class Client(models.Model):
     birthday = models.DateField(null=True, blank=True)
     # Credenciales
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    _pending_role = None
     # interno
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -79,12 +80,12 @@ def default_expiration_date():
 def create_default_user(client):
     if not client.email or not client.documentNumber:
         raise ValidationError("El cliente debe tener un email y un documentNumber para crear el usuario.")
-
     # Verificar si ya existe un usuario con el mismo email
     if User.objects.filter(email=client.email).exists():
         raise ValidationError("El email ya está en uso.")
     # Crear y devolver el usuario
-    return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=1)
+    role = client._pending_role or 1
+    return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=role)
 
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
