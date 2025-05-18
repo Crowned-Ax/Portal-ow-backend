@@ -87,6 +87,10 @@ def create_default_user(client):
     role = client._pending_role or 1
     return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=role)
 
+class UserClientAssignment(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    assigned_clients = models.ManyToManyField(Client, blank=True)
+
 class ClientService(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     service = models.ForeignKey(Services, on_delete=models.CASCADE)

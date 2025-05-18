@@ -57,8 +57,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     accountNumber = models.CharField(max_length=50, blank=True)
     accountType = models.CharField(max_length=50, blank=True)
     holderBank = models.CharField(max_length=50, blank=True)
-    # campos de admin
-    is_staff = models.BooleanField(default=False)
     #interno
     updated_at = models.DateTimeField(auto_now=True) 
     USERNAME_FIELD = 'email'
