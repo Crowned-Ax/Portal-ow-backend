@@ -15,11 +15,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_assigned_clients(self, obj):
-        try:
-            assignment = UserClientAssignment.objects.get(user=obj)
+        assignment = UserClientAssignment.objects.filter(user=obj).first()
+        if assignment:
             return SimpleClientSerializer(assignment.assigned_clients.all(), many=True).data
-        except:
-            return []
+        return []
 
 class UserClientAssignmentSerializer(serializers.ModelSerializer):
     class Meta:
