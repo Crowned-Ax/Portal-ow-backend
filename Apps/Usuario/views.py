@@ -72,7 +72,6 @@ class UserDeleteView(generics.DestroyAPIView):
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
-    #permission_classes = [IsAdminUser]  # Solo un administrador puede crear superusuarios
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -81,10 +80,10 @@ class CreateUserView(generics.CreateAPIView):
             
             email = validated_data.pop('email')
             password = validated_data.pop('password') 
-            validated_data.pop('is_staff')
-            validated_data.pop('is_superuser')
-            validated_data.pop('groups')
-            validated_data.pop('user_permissions')
+            validated_data.pop('is_staff', None)
+            validated_data.pop('is_superuser', None)
+            validated_data.pop('groups', None)
+            validated_data.pop('user_permissions', None)
 
             user = User.objects.create_superuser(
                 email=email,
