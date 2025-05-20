@@ -16,16 +16,21 @@ from rest_framework.decorators import action
 
 # Cliente simplificado
 class SimpleClientView(ListAPIView):
-    queryset = Client.objects.all().order_by('name')
     serializer_class = SimpleClientSerializer
-
+    def get_queryset(self):
+        # Si el usuario es un cliente, solo puede ver su propio perfil
+        role = self.request.user.rol
+        if role and role.is_staff == False:
+            return Client.objects.filter(email=self.request.user.email)
+        # Si no es un cliente, devuelve todos los clientes
+        return Client.objects.all().order_by('name')
 # Listar y crear clientes
 class ClientListCreateView(generics.ListCreateAPIView):
     serializer_class = ClientSerializer
     def get_queryset(self):
         # Si el usuario es un cliente, solo puede ver su propio perfil
         role = self.request.user.rol
-        if role and (role.name).lower() == "cliente":
+        if role and role.is_staff == False:
             return Client.objects.filter(email=self.request.user.email)
         # Si no es un cliente, devuelve todos los clientes
         return Client.objects.all().order_by('-updated_at')
@@ -38,7 +43,7 @@ class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         # Si el usuario es un cliente, solo puede ver su propio perfil
         role = self.request.user.rol
-        if role and (role.name).lower() == "cliente":
+        if role and role.is_staff == False:
             return Client.objects.filter(email=self.request.user.email)
         # Si no es un cliente, devuelve todos los clientes
         return Client.objects.all()
@@ -46,7 +51,7 @@ class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         # Si el usuario es un cliente, solo puede actualizar su propio perfil
         role = self.request.user.rol
-        if role and (role.name).lower() == "cliente":
+        if role and role.is_staff == False:
             if serializer.instance.email != self.request.user.email:
                 raise PermissionDenied("No puedes actualizar otro cliente")
             serializer.save()
@@ -56,7 +61,7 @@ class ClientDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         # Si el usuario es un cliente, no puede hacer nada
         role = self.request.user.rol
-        if role and (role.name).lower() == "cliente":
+        if role and role.is_staff == False:
             raise PermissionDenied("No tienes permisos para eliminar")
         else:
             instance.user.delete()

@@ -71,7 +71,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        #'Apps.Usuario.permissions.HasActionPermission',
+        'Apps.Usuario.permissions.HasActionPermission',
     ],
 }
 
