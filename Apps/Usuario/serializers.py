@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         try:
             assignment = UserClientAssignment.objects.get(user=obj)
             return SimpleClientSerializer(assignment.assigned_clients.all(), many=True).data
-        except UserClientAssignment.DoesNotExist:
+        except:
             return []
 
 class UserClientAssignmentSerializer(serializers.ModelSerializer):

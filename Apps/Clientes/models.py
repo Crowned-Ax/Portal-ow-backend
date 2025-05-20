@@ -85,7 +85,7 @@ def create_default_user(client):
         raise ValidationError("El email ya está en uso.")
     # Crear y devolver el usuario
     role = client._pending_role or 1
-    return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=role)
+    return User.objects.create_user(email=client.email, password=client.documentNumber, rol_id=role, name=client.name, lastname=client.lastname)
 
 class UserClientAssignment(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
