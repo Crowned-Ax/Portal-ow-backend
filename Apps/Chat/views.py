@@ -71,16 +71,35 @@ class MessageView(APIView):
 class Contacts(APIView):
     def get(self, request, *args, **kwargs):
         current_user = request.user
-        # Obtener todos los usuarios excepto el que hace la petición
-        users = User.objects.exclude(email=current_user.email)
+        is_staff = current_user.rol.is_staff  # True = colaborador, False = cliente
+
+        if is_staff:
+            # Colaboradores: ver todos los usuarios excepto a sí mismo
+            collaborators = User.objects.exclude(email=current_user.email)
+            super_admins = User.objects.filter(rol__name="Super Admin")
+            # Unir sin duplicados
+            users = list(set(collaborators + list(super_admins)))
+        else:
+            try: # Clientes: solo mostrar colaboradores que lo tengan asignado
+                from ..Clientes.models import Client, UserClientAssignment
+                client = Client.objects.get(user=current_user)
+            except Client.DoesNotExist:
+                return Response(
+                    {"detail": "Este usuario no está asociado a ningún cliente."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Buscar asignaciones donde el usuario actual (cliente) esté asignado
+            assigned = UserClientAssignment.objects.filter(assigned_clients=client)
+            users = User.objects.filter(email__in=assigned.values_list('user__email', flat=True))
 
         user_data = []
 
         for user in users:
-            #buscar si hay chat
+            # Buscar si hay chat
             chat = Chat.objects.filter(
-            (models.Q(person1=current_user) & models.Q(person2=user)) |
-            (models.Q(person1=user) & models.Q(person2=current_user))
+                (models.Q(person1=current_user) & models.Q(person2=user)) |
+                (models.Q(person1=user) & models.Q(person2=current_user))
             ).first()
             # Buscar el último mensaje entre el usuario actual y el usuario iterado
             last_message_content = None
@@ -94,8 +113,7 @@ class Contacts(APIView):
             # Serializa el usuario
             user_serializer = SimpleUserSerializer(user)
             user_info = user_serializer.data
-
-            # Agrega la información del último mensaje
+            # Agregar datos del último mensaje
             user_info['last_message'] = last_message_content
             user_info['last_message_date'] = last_message_date
 
