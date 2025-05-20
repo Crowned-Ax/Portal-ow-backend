@@ -25,7 +25,7 @@ class HasActionPermission(BasePermission):
 
         model_name = model.__name__.lower()
 
-        excluded_models = ['chat', 'message', 'schedule']
+        excluded_models = ['chat', 'message', 'schedule', 'access', 'notification']
         if model_name in excluded_models:
             return True  # Permitir acceso a estos modelos sin necesidad de verificación de permisos
 

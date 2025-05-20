@@ -7,14 +7,24 @@ perm_data = {
     "ClientService": ["add", "change", "delete", "view"],
     "User": ["add", "change", "delete", "view"],
     "Services": ["add", "change", "delete", "view"],
-    "PaymentHistory": ["change", "delete", "view"]
+    "PaymentHistory": ["change", "delete", "view"],
+    "Role": ["change", "delete", "view"],
+    "CustomPermission": ["change", "delete", "view"],
+    "TributaryAdd": ["change", "delete", "view"],
+    "UserClientAssignment": ["change", "delete", "view"],
+
 }
+
 perm_data_names = {
     "Client": "Cliente",
     "ClientService": "ServiciosWordpress",
     "User": "Colaboradores",
     "Services": "Servicios",
-    "PaymentHistory": "Pagos"
+    "PaymentHistory": "Pagos",
+    "Role": "Roles",
+    "CustomPermission": "Permisos",
+    "TributaryAdd": "Tributaria",
+    "UserClientAssignment": "Asignacion"
 }
 
 class Command(BaseCommand):
