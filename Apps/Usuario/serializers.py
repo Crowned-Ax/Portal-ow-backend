@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
-    assigned_clients = serializers.SerializerMethodField()
+    assigned_clients = serializers.SerializerMethodField(required=False)
 
     class Meta:
         model = User
