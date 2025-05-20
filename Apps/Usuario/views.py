@@ -1,5 +1,6 @@
 from rest_framework import generics, status, viewsets
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.hashers import check_password
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from django.conf import settings
 from django.db.models import Q
 from .models import User, Role, CustomPermission
 from ..Notificaciones.models import Notification
+from ..Clientes.models import UserClientAssignment
 from django.utils import timezone
 from .serializers import (UserSerializer,
                           LoginSerializer,
@@ -21,7 +23,8 @@ from .serializers import (UserSerializer,
                           PasswordResetSerializer,
                           RoleSerializer,
                           CustomPermissionSerializer,
-                          UserRoleSerializer)
+                          UserRoleSerializer,
+                          UserClientAssignmentSerializer)
 
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
@@ -90,8 +93,6 @@ class CreateUserView(generics.CreateAPIView):
             )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
@@ -151,7 +152,7 @@ class PasswordResetRequestView(APIView):
 
             # Construir el enlace de restablecimiento
             frontend_url = "https://okweb.one"
-            reset_url = f"{frontend_url}/reset-password/{uid}/{token}/"
+            reset_url = f"{frontend_url}/recuperar/{uid}/{token}/"
             from_email = settings.DEFAULT_FROM_EMAIL
 
             # Enviar el correo
@@ -212,3 +213,51 @@ class UserRoleViewSet(viewsets.ModelViewSet):
     serializer_class = UserRoleSerializer
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
+
+class AssignedClientViewSet(viewsets.ModelViewSet):
+    queryset = UserClientAssignment.objects.all()
+    serializer_class = UserClientAssignmentSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_email = self.request.query_params.get('user')
+
+        if user_email:
+            queryset = queryset.filter(user__email=user_email)
+
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        user_email = request.data.get('user')
+        client_ids = request.data.get('assigned_clients', [])
+
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        assignment, created = UserClientAssignment.objects.get_or_create(user=user)
+        # Agrega los nuevos clientes sin borrar los anteriores
+        for client_id in client_ids:
+            assignment.assigned_clients.add(client_id)
+        assignment.save()
+        serializer = self.get_serializer(assignment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='remove-client')
+    def remove_client(self, request):
+        user_email = request.data.get('user')
+        client_id = request.data.get('client_id')
+        if not user_email or not client_id:
+            return Response({'error': 'user and client_id are required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            assignment = UserClientAssignment.objects.get(user__email=user_email)
+        except UserClientAssignment.DoesNotExist:
+            return Response({'error': 'UserClientAssignment not found'}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            client = assignment.assigned_clients.get(id=client_id)
+        except:
+            return Response({'error': 'Algo salio mal con el cliente'}, status=status.HTTP_404_NOT_FOUND)
+        assignment.assigned_clients.remove(client)
+        assignment.save()
+        return Response({'message': f'Client {client_id} removed from user {user_email}'}, status=status.HTTP_200_OK)

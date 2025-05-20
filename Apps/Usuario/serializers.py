@@ -1,5 +1,6 @@
 from .models import User, CustomPermission, Role
 from ..Clientes.models import Client, UserClientAssignment
+from ..Clientes.serializers import SimpleClientSerializer
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
@@ -7,16 +8,29 @@ from django.contrib.auth import authenticate
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
-   # assigned_clients = 
+    assigned_clients = serializers.SerializerMethodField()
 
     class Meta:
         model = User
+        fields = '__all__'
+    
+    def get_assigned_clients(self, obj):
+        try:
+            assignment = UserClientAssignment.objects.get(user=obj)
+            return SimpleClientSerializer(assignment.assigned_clients.all(), many=True).data
+        except UserClientAssignment.DoesNotExist:
+            return []
+
+class UserClientAssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserClientAssignment
         fields = '__all__'
 
 class SimpleUserSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
     rol = serializers.SlugRelatedField(read_only=True, slug_field='name')
     is_staff = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
         fields = ['email', 'fullname', 'rol', 'photo', 'is_staff']

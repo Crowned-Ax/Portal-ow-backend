@@ -11,7 +11,8 @@ from .views import (
     PasswordResetView,
     RoleViewSet,
     CustomPermissionViewSet,
-    UserRoleViewSet
+    UserRoleViewSet,
+    AssignedClientViewSet
 )
 from rest_framework.routers import DefaultRouter
 app_name = 'usuario'
@@ -20,6 +21,7 @@ router = DefaultRouter()
 router.register(r'roles', RoleViewSet)
 router.register(r'permissions', CustomPermissionViewSet)
 router.register(r'user-rol', UserRoleViewSet)
+router.register(r'assign', AssignedClientViewSet)
 
 urlpatterns = [
     path("change-password/", ChangePasswordView.as_view(), name='change-password'),# Cambiar la contraseña del usuario logueado
