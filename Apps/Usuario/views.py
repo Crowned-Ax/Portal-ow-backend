@@ -14,7 +14,7 @@ from django.conf import settings
 from django.db.models import Q
 from .models import User, Role, CustomPermission
 from ..Notificaciones.models import Notification
-from ..Clientes.models import UserClientAssignment
+from ..Clientes.models import UserClientAssignment, Client
 from django.utils import timezone
 from .serializers import (UserSerializer,
                           LoginSerializer,
@@ -30,13 +30,13 @@ class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
     def get_queryset(self):
         # Excluir al usuario que hace la petición
-        return User.objects.exclude(Q(email=self.request.user.email) | Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
+        return User.objects.exclude(Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
 
 class SimpleUserListView(generics.ListAPIView):
     serializer_class = SimpleUserSerializer
     def get_queryset(self):
         # Excluir al usuario que hace la petición
-        return User.objects.exclude(Q(email=self.request.user.email) | Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
+        return User.objects.exclude(Q(rol__name="Cliente") | Q(rol__name="Cliente Aux")).order_by('name')
 
 class UserDetailView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
@@ -261,3 +261,25 @@ class AssignedClientViewSet(viewsets.ModelViewSet):
         assignment.assigned_clients.remove(client)
         assignment.save()
         return Response({'message': f'Client {client_id} removed from user {user_email}'}, status=status.HTTP_200_OK)
+    
+class CollaboratorsForClientView(APIView):
+
+    def get(self, request):
+        user = request.user
+        # Verifica que el usuario esté relacionado con un cliente
+        try:
+            client = Client.objects.get(user=user)
+        except Client.DoesNotExist:
+            return Response(
+                {'detail': 'No se encontró un cliente asociado a este usuario.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        # Buscar asignaciones donde este cliente esté incluido
+        assignments = UserClientAssignment.objects.filter(assigned_clients=client)
+        collaborators = [assignment.user for assignment in assignments]
+        super_admins = User.objects.filter(rol__name="Super Admin")
+        # Unir sin duplicados
+        combined_users = list(set(collaborators + list(super_admins)))
+
+        serializer = SimpleUserSerializer(combined_users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

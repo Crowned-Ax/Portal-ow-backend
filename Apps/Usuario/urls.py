@@ -12,7 +12,8 @@ from .views import (
     RoleViewSet,
     CustomPermissionViewSet,
     UserRoleViewSet,
-    AssignedClientViewSet
+    AssignedClientViewSet,
+    CollaboratorsForClientView
 )
 from rest_framework.routers import DefaultRouter
 app_name = 'usuario'
@@ -26,6 +27,7 @@ router.register(r'assign', AssignedClientViewSet)
 urlpatterns = [
     path("change-password/", ChangePasswordView.as_view(), name='change-password'),# Cambiar la contraseña del usuario logueado
     path("simple/", SimpleUserListView.as_view(), name='simple-user-list'), # Traer todos los usuarios con info minima
+    path("simple-cfc/", CollaboratorsForClientView.as_view(), name='collab-for-client'),
     path('<str:email>/delete/', UserDeleteView.as_view(), name='user-delete'),
     path('colaborator/', CreateUserView.as_view(), name='create-superuser'),
     path("login/", LoginView.as_view(), name="login"), # Loguearse
