@@ -78,7 +78,7 @@ class Contacts(APIView):
             collaborators = User.objects.exclude(email=current_user.email)
             super_admins = User.objects.filter(rol__name="Super Admin")
             # Unir sin duplicados
-            users = list(set(collaborators + list(super_admins)))
+            users = list(set(list(collaborators) + list(super_admins)))
         else:
             try: # Clientes: solo mostrar colaboradores que lo tengan asignado
                 from ..Clientes.models import Client, UserClientAssignment
