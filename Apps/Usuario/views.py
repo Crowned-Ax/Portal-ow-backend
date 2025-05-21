@@ -85,7 +85,7 @@ class CreateUserView(generics.CreateAPIView):
             validated_data.pop('groups', None)
             validated_data.pop('user_permissions', None)
 
-            user = User.objects.create_superuser(
+            User.objects.create_superuser(
                 email=email,
                 password=password,
                 **validated_data
@@ -226,6 +226,15 @@ class RoleViewSet(viewsets.ModelViewSet):
         instance.permissions.add(*base_perms)
 
         return response
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.name == "Super Admin":
+            return Response(
+                {"detail": "No se puede eliminar el rol 'Super Admin'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().destroy(request, *args, **kwargs)
 
 class CustomPermissionViewSet(viewsets.ModelViewSet):
     queryset = CustomPermission.objects.all()

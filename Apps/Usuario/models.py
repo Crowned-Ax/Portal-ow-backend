@@ -60,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     #interno
     updated_at = models.DateTimeField(auto_now=True) 
     USERNAME_FIELD = 'email'
+    is_staff = models.BooleanField(default=False)
     rol = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     objects = UserManager()
 
