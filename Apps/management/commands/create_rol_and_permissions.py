@@ -50,11 +50,12 @@ class Command(BaseCommand):
         
         # permisos para todos
         additional_codes = [
-            "add_role", "change_role", "delete_role", "view_role",
-            "add_custompermission", "change_custompermission", "delete_custompermission", "view_custompermission",
+            "view_role",
+            "view_custompermission",
             "add_tributaryadd", "change_tributaryadd", "delete_tributaryadd", "view_tributaryadd",
-            "add_userclientassignment", "change_userclientassignment", "delete_userclientassignment", "view_userclientassignment"
+            "view_userclientassignment"
         ]
+        additional_codes_staff = additional_codes + ["add_userclientassignment", "change_userclientassignment", "delete_userclientassignment"]
         # Asignar permisos por rol
         all_permissions = CustomPermission.objects.all()
 
@@ -62,11 +63,11 @@ class Command(BaseCommand):
         roles["Super Admin"].permissions.set(all_permissions)
 
         # Admin → todos menos los que empiezan con 'eliminar_'
-        admin_perms = CustomPermission.objects.filter(~Q(code__startswith="delete_") | Q(code__in=additional_codes))
+        admin_perms = CustomPermission.objects.filter(~Q(code__startswith="delete_") | Q(code__in=additional_codes_staff))
         roles["Admin"].permissions.set(admin_perms)
 
         # Colaborador → solo los que empiezan con 'ver_'
-        colab_perms = CustomPermission.objects.filter(Q(code__startswith="view_") | Q(code__in=additional_codes))
+        colab_perms = CustomPermission.objects.filter(Q(code__startswith="view_") | Q(code__in=additional_codes_staff))
         roles["Colaborador"].permissions.set(colab_perms)
 
         # Cliente → puede ver y editar clientes, ver clientService, users y paymentHistory

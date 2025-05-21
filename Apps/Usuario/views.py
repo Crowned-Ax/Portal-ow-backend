@@ -202,6 +202,30 @@ class RoleViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_staff=is_staff)
         return queryset
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Guarda los permisos base antes de actualizar
+        additional_codes = [
+            "view_role",
+            "view_custompermission",
+            "add_tributaryadd", "change_tributaryadd", "delete_tributaryadd", "view_tributaryadd",
+            "view_userclientassignment"
+        ]
+        additional_codes_staff = additional_codes + ["add_userclientassignment", "change_userclientassignment", "delete_userclientassignment"]
+        
+        if(request.data.get('is_staff')):
+            base_codes = additional_codes_staff
+        else:
+            base_codes = additional_codes
+        base_perms = CustomPermission.objects.filter(code__in=base_codes)
+
+        response = super().update(request, *args, **kwargs)
+
+        # Reasignar los permisos base
+        instance.permissions.add(*base_perms)
+
+        return response
 
 class CustomPermissionViewSet(viewsets.ModelViewSet):
     queryset = CustomPermission.objects.all()
