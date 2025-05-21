@@ -1,5 +1,6 @@
 from ...Usuario.models import CustomPermission, Role
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 # Define todos los permisos base
 perm_data = {
@@ -46,14 +47,14 @@ class Command(BaseCommand):
         for name, is_staff in zip(role_names, default_staff):
             role, _ = Role.objects.get_or_create(name=name, defaults={'is_staff': is_staff})
             roles[name] = role
-
+        
+        # permisos para todos
         additional_codes = [
             "add_role", "change_role", "delete_role", "view_role",
             "add_custompermission", "change_custompermission", "delete_custompermission", "view_custompermission",
             "add_tributaryadd", "change_tributaryadd", "delete_tributaryadd", "view_tributaryadd",
             "add_userclientassignment", "change_userclientassignment", "delete_userclientassignment", "view_userclientassignment"
         ]
-        perms_additional = CustomPermission.objects.filter(code__in=additional_codes)
         # Asignar permisos por rol
         all_permissions = CustomPermission.objects.all()
 
@@ -61,13 +62,11 @@ class Command(BaseCommand):
         roles["Super Admin"].permissions.set(all_permissions)
 
         # Admin → todos menos los que empiezan con 'eliminar_'
-        admin_perms_base = all_permissions.exclude(code__startswith="delete_")
-        admin_perms = list(set(admin_perms_base + list(perms_additional)))
+        admin_perms = CustomPermission.objects.filter(~Q(code__startswith="delete_") | Q(code__in=additional_codes))
         roles["Admin"].permissions.set(admin_perms)
 
         # Colaborador → solo los que empiezan con 'ver_'
-        colab_perms_base = all_permissions.filter(code__startswith="view_")
-        colab_perms = list(set(colab_perms_base + list(perms_additional)))
+        colab_perms = CustomPermission.objects.filter(Q(code__startswith="view_") | Q(code__in=additional_codes))
         roles["Colaborador"].permissions.set(colab_perms)
 
         # Cliente → puede ver y editar clientes, ver clientService, users y paymentHistory
@@ -77,7 +76,7 @@ class Command(BaseCommand):
             "view_user",
             "view_paymenthistory"
         ]
-        cliente_codes = cliente_codes_base + perms_additional
+        cliente_codes = cliente_codes_base + additional_codes
         cliente_perms = CustomPermission.objects.filter(code__in=cliente_codes)
         roles["Cliente"].permissions.set(cliente_perms)
 
@@ -88,6 +87,6 @@ class Command(BaseCommand):
             "view_user",
             "view_services"
         ]
-        cliente_aux_codes = cliente_aux_codes_base + perms_additional
+        cliente_aux_codes = cliente_aux_codes_base + additional_codes
         cliente_aux_perms = CustomPermission.objects.filter(code__in=cliente_aux_codes)
         roles["Cliente Aux"].permissions.set(cliente_aux_perms)
