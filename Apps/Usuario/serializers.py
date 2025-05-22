@@ -37,16 +37,6 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     def get_fullname(self, obj):
         return f"{obj.name} {obj.lastname}"
     
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-
-        if instance.rol and instance.rol.is_staff:
-            client = Client.objects.filter(email=instance.email).first()
-            data['corporate_name'] = client.corporate_name if client else 'Ok Web'
-        else:
-            data['corporate_name'] = 'Ok Web'
-        return data
-    
     def get_is_staff(self, obj):
         return obj.rol.is_staff if obj.rol else None
     

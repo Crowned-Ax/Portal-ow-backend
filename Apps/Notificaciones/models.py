@@ -26,7 +26,7 @@ class Notification(models.Model):
 
         if self.type == 'info' and self.user:
             from_email = settings.NOTIF_FROM_EMAIL
-            subject = "Nueva notificación importante"
+            subject = "Nueva notificación"
             message = self.message
             recipient_list = [self.user.email]
 
