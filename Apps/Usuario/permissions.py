@@ -21,7 +21,11 @@ class HasActionPermission(BasePermission):
         # Detectar modelo automáticamente
         model = getattr(getattr(view, 'queryset', None), 'model', None)
         if not model:
-            return True
+            serializer_class = getattr(view, 'serializer_class', None)
+            if serializer_class and hasattr(serializer_class.Meta, 'model'):
+                model = serializer_class.Meta.model
+            else:
+                return True
 
         model_name = model.__name__.lower()
 
