@@ -295,18 +295,26 @@ class AssignedClientViewSet(viewsets.ModelViewSet):
         return Response({'message': f'Client {client_id} removed from user {user_email}'}, status=status.HTTP_200_OK)
     
 class CollaboratorsForClientView(APIView):
+    def get(self, request, client_id=None):
+        if client_id:
+            try:
+                client = Client.objects.get(id=client_id)
+            except Client.DoesNotExist:
+                return Response(
+                    {'detail': f"No se encontró un cliente con id: {client_id}."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            user = request.user
+            try:
+                client = Client.objects.get(user=user)
+            except Client.DoesNotExist:
+                return Response(
+                    {'detail': 'No se encontró un cliente asociado a este usuario.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-    def get(self, request):
-        user = request.user
-        # Verifica que el usuario esté relacionado con un cliente
-        try:
-            client = Client.objects.get(user=user)
-        except Client.DoesNotExist:
-            return Response(
-                {'detail': 'No se encontró un cliente asociado a este usuario.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        # Buscar asignaciones donde este cliente esté incluido
+        # Obtener asignaciones
         assignments = UserClientAssignment.objects.filter(assigned_clients=client)
         collaborators = [assignment.user for assignment in assignments]
         super_admins = User.objects.filter(rol__name="Super Admin")
