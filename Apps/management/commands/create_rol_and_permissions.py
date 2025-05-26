@@ -75,7 +75,8 @@ class Command(BaseCommand):
             "view_client", "change_client",
             "view_clientservice",
             "view_user",
-            "view_paymenthistory"
+            "view_paymenthistory",
+            "view_services"
         ]
         cliente_codes = cliente_codes_base + additional_codes
         cliente_perms = CustomPermission.objects.filter(code__in=cliente_codes)
