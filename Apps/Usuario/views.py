@@ -191,7 +191,7 @@ class PasswordResetView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RoleViewSet(viewsets.ModelViewSet):
-    queryset = Role.objects.all()
+    queryset = Role.objects.all().order_by("name")
     serializer_class = RoleSerializer
 
     def get_queryset(self):
