@@ -157,7 +157,7 @@ class PasswordResetRequestView(APIView):
             # Enviar el correo
             send_mail(
                 'Recuperación de contraseña',
-                f'Hola, {user.get_full_name()}. Has solicitado un restablecimiento de contraseña.\n'
+                f'Hola, {user.get_full_name()}.\n Has solicitado un restablecimiento de contraseña.\n'
                 f'Entra en el siguiente enlace para restablecer tu contraseña:\n{reset_url}',
                 from_email,
                 [email],
