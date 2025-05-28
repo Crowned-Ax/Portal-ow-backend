@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Client, ClientService, TributaryAdd
-from ..Usuario.models import Role
+from .models import Client, ClientService, TributaryAdd, create_default_user
+from ..Usuario.models import Role, User
 
 class SimpleClientSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
@@ -38,17 +38,30 @@ class ClientSerializer(serializers.ModelSerializer):
         return client
 
     def update(self, instance, validated_data):
+        r = Role.objects.filter(name="Cliente").first()
         role = validated_data.pop('rol', None)
         validated_data.pop('user', None)
-        # Actualizar datos del cliente normalmente
+
+        old_email = instance.email
+        new_email = validated_data.get('email', old_email)
+
+        if old_email != new_email:
+            if User.objects.filter(email=new_email).exists():
+                raise serializers.ValidationError("El nuevo email ya está en uso.")
+
+            if instance.user:
+                instance.user.delete()
+
+            instance._pending_role = role.id if role else r
+
+            instance.email = new_email
+            instance.user = create_default_user(instance)
+
+        # Actualizar otros campos del cliente
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-        instance.save()
-        # Si se recibió role, actualizar el usuario relacionado
 
-        if role:
-            instance.user.rol = role
-            instance.user.save()
+        instance.save()
         return instance
     
 class ClientServiceSerializer(serializers.ModelSerializer):
