@@ -13,7 +13,6 @@ perm_data = {
     "CustomPermission": ["add", "change", "delete", "view"],
     "TributaryAdd": ["add", "change", "delete", "view"],
     "UserClientAssignment": ["add", "change", "delete", "view"],
-
 }
 
 perm_data_names = {

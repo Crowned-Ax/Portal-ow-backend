@@ -209,7 +209,6 @@ class RoleViewSet(viewsets.ModelViewSet):
         additional_codes = [
             "view_role",
             "view_custompermission",
-            "add_tributaryadd", "change_tributaryadd", "delete_tributaryadd", "view_tributaryadd",
             "view_userclientassignment"
         ]
         additional_codes_staff = additional_codes + ["add_userclientassignment", "change_userclientassignment", "delete_userclientassignment"]

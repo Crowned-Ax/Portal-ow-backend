@@ -52,7 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     formation = models.CharField(max_length=50, blank=True)
     knowledge = models.CharField(max_length=50, blank=True)
     skill = models.CharField(max_length=50, blank=True)
-    #
+    # Bancaria
     bank = models.CharField(max_length=50, blank=True)
     accountNumber = models.CharField(max_length=50, blank=True)
     accountType = models.CharField(max_length=50, blank=True)
