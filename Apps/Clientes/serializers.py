@@ -60,7 +60,11 @@ class ClientSerializer(serializers.ModelSerializer):
         # Actualizar otros campos del cliente
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
+        
+        if instance.user:
+            instance.user.name = instance.name
+            instance.user.lastname = instance.lastname
+            instance.user.save()
         instance.save()
         return instance
     
