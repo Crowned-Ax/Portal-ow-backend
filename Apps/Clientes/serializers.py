@@ -4,14 +4,17 @@ from ..Usuario.models import Role, User
 
 class SimpleClientSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
+    corporate_name = serializers.SerializerMethodField()
     class Meta:
         model = Client
-        fields = ['id','fullname', 'email', 'photo',]
+        fields = ['id', 'corporate_name', 'fullname', 'email', 'photo']
 
     def get_fullname(self, obj):
         return f"{obj.name} {obj.lastname}"
     
-    
+    def get_corporate_name(self, obj):
+        tributary = TributaryAdd.objects.filter(client=obj).first()
+        return tributary.corporate_name if tributary else None
 
 class ClientSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(format="%d/%m/%Y", input_formats=["%d/%m/%Y"], required=False,  allow_null=True)
