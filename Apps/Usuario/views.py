@@ -254,6 +254,7 @@ class AssignedClientViewSet(viewsets.ModelViewSet):
         user_email = self.request.query_params.get('user')
 
         if user_email:
+            user_email = user_email.strip().rstrip('/')
             queryset = queryset.filter(user__email=user_email)
 
         return queryset
