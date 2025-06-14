@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import Schedule
 from ..Usuario.models import User
-from ..Clientes.models import Client
+from ..Clientes.models import Client, UserClientAssignment
 from .serializers import ScheduleSerializer
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -45,7 +45,12 @@ class ScheduleViewSet(viewsets.ModelViewSet):
             )
         else:
             assigned_user = self.request.user
-
+        if assigned_client and assigned_user:
+            # Buscar si ya existe una asignación para ese usuario
+            assignment, created = UserClientAssignment.objects.get_or_create(user=assigned_user)
+            # Agregar el cliente si no está ya asignado
+            if assigned_client not in assignment.assigned_clients.all():
+                assignment.assigned_clients.add(assigned_client)
         serializer.save(
             created_by=creador,
             assigned_to=assigned_user
