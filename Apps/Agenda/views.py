@@ -2,7 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import Schedule
 from ..Usuario.models import User
-from ..Clientes.models import Client, UserClientAssignment
+from ..Clientes.models import Client, UserClientAssignment, TributaryAdd
 from .serializers import ScheduleSerializer
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -30,6 +30,8 @@ class ScheduleViewSet(viewsets.ModelViewSet):
             if not assigned_client:
                 raise ValidationError("El cliente asignado no es válido.")
             creador = assigned_client.user
+            corporate_name = TributaryAdd.objects.filter(client=assigned_client).values_list('corporate_name', flat=True).first() or 'Ok Web'
+
         else:
             assigned_client = None
             creador = User.objects.filter(email=self.request.user).first()
@@ -39,7 +41,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
             if not assigned_user:
                 raise ValidationError("El usuario asignado no es válido.")
             Notification.objects.create(
-                message=f"{creador.get_full_name()} te asigno una tarea",
+                message=f"Hola, {assigned_user.get_full_name()} tienes una nueva tarea asignada por {creador.get_full_name()} de {corporate_name}.\nPara realizar la tarea puedes ingresar a okweb.one.",
                 date=timezone.now().date(),
                 type="info",
                 user=assigned_user
