@@ -31,6 +31,7 @@ class ScheduleViewSet(viewsets.ModelViewSet):
                 raise ValidationError("El cliente asignado no es válido.")
             creador = assigned_client.user
         else:
+            assigned_client = None
             creador = User.objects.filter(email=self.request.user).first()
 
         if assigned_email and assigned_email != "":
