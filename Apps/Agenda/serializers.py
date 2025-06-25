@@ -18,6 +18,9 @@ class ScheduleSerializer(serializers.ModelSerializer):
         if instance.created_by:
             user = User.objects.filter(email=instance.created_by).first()
             data['created_by_name'] = user.get_full_name()
+        if instance.assigned_to:
+            user = User.objects.filter(email=instance.assigned_to).first()
+            data['assigned_to_name'] = user.get_full_name()
         return data
     
     def get_corporate_name(self, obj):
