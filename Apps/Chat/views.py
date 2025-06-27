@@ -75,10 +75,7 @@ class Contacts(APIView):
 
         if is_staff:
             # Colaboradores: ver todos los usuarios excepto a sí mismo
-            collaborators = User.objects.exclude(email=current_user.email)
-            super_admins = User.objects.filter(rol__name="Super Admin")
-            # Unir sin duplicados
-            users = list(set(list(collaborators) + list(super_admins)))
+            users = User.objects.exclude(email=current_user.email)
         else:
             try: # Clientes: solo mostrar colaboradores que lo tengan asignado
                 from ..Clientes.models import Client, UserClientAssignment
@@ -91,7 +88,9 @@ class Contacts(APIView):
 
             # Buscar asignaciones donde el usuario actual (cliente) esté asignado
             assigned = UserClientAssignment.objects.filter(assigned_clients=client)
-            users = User.objects.filter(email__in=assigned.values_list('user__email', flat=True))
+            super_admins = User.objects.filter(rol__name="Super Admin")
+            assig_users = User.objects.filter(email__in=assigned.values_list('user__email', flat=True))
+            users = list(set(list(assig_users) + list(super_admins)))
 
         user_data = []
 
