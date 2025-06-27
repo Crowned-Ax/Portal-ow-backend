@@ -73,7 +73,13 @@ class Client(models.Model):
         if not self.user:
             self.user = create_default_user(self)  # Asigna el usuario antes de guardar
         super().save(*args, **kwargs)
-
+    
+    def delete(self, *args, **kwargs):
+        # Guarda el usuario antes de eliminar el cliente
+        user_to_delete = self.user
+        super().delete(*args, **kwargs)
+        if user_to_delete:
+            user_to_delete.delete()
 def default_expiration_date():
     return timezone.now() + timedelta(days=30)
 
